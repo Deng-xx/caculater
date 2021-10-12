@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">pp计算器</string>
+
+    <string name="app_help">实现了基础的运算和相关函数的定义</string>
+</resources>
