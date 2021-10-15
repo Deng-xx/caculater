@@ -2,4 +2,8 @@
     <string name="app_name">pp计算器</string>
 
     <string name="app_help">实现了基础的运算和相关函数的定义</string>
+    <string name="app_more">更多的功能，包括了汇率转换以及精度更高的本金和本息计算等</string>
+    <string name="exchange_cal">汇率计算</string>
+    <string name="principal_interest_cal">本金和利息计算</string>
+    <string name="input_number">请输入数字</string>
 </resources>
