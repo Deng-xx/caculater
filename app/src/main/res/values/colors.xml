@@ -4,5 +4,8 @@
     <color name="colorPrimaryDark">#212121</color>
     <color name="colorAccent">@color/colorWhite</color>
     <color name="colorWhite">#f5f5f5</color>
+    <color name="colorTouming">#99DCDC</color>
+    <color name="colorRed">#ED5555</color>
+    <color name="colorGreen">#9911ED48</color>
 
 </resources>

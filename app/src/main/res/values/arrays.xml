@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="money_type">
+        <item>人民币</item>
+        <item>美元</item>
+        <item>日元</item>
+    </string-array>
+</resources>
