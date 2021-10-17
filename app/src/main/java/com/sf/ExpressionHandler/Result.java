@@ -27,10 +27,10 @@ public class Result {
         return this;
     }
 
-/*    public Result append(String name) {
+    public Result append(String name) {
         //Temporarily not used
         return this;
-    }*/
+    }
 
     //仅构造complex
     public Result setVal(Complex v_) {
