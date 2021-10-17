@@ -20,14 +20,14 @@
         <activity
             android:name=".ResultsActivity"
             android:label="运算结果" />
-        <activity
+<!--        <activity
             android:name=".CapitalMoneyActivity"
             android:label="大写数字"
             android:screenOrientation="portrait" />
         <activity
             android:name=".BigDecimalActivity"
             android:label="大数运算"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait" />-->
         <activity
             android:name=".AboutActivity"
             android:screenOrientation="portrait" />

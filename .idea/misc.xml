@@ -3,6 +3,14 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/AndroidStudioProjects/calculater/app/src/main/res/layout/activity_main.xml" value="0.23802083333333332" />
+        <entry key="..\:/AndroidStudioProjects/calculater/app/src/main/res/layout/activity_results.xml" value="0.2375" />
+        <entry key="..\:/AndroidStudioProjects/calculater/app/src/main/res/layout/button_constant.xml" value="0.2375" />
+        <entry key="..\:/AndroidStudioProjects/calculater/app/src/main/res/layout/button_function.xml" value="0.2375" />
+        <entry key="..\:/AndroidStudioProjects/calculater/app/src/main/res/layout/button_numeric.xml" value="0.2" />
+        <entry key="..\:/AndroidStudioProjects/calculater/app/src/main/res/layout/button_operator.xml" value="0.2375" />
+        <entry key="..\:/AndroidStudioProjects/calculater/app/src/main/res/layout/button_sidebar.xml" value="0.2375" />
+        <entry key="..\:/AndroidStudioProjects/calculater/app/src/main/res/layout/content_main.xml" value="0.2375" />
         <entry key="..\:/Users/Lenovo/Desktop/calculator/calculator/app/src/main/res/layout/activity_main.xml" value="0.2" />
         <entry key="..\:/Users/Lenovo/Desktop/calculator/calculator/app/src/main/res/layout/button_operator.xml" value="0.2" />
         <entry key="..\:/Users/Lenovo/Desktop/calculator/calculator/app/src/main/res/layout/button_sidebar.xml" value="0.2" />

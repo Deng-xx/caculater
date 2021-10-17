@@ -2,16 +2,19 @@ package com.sf.ExpressionHandler;
 
 import android.text.TextUtils;
 
+//定义复数
 public class Complex {
+    //定义一些数学量
     public static Complex E = new Complex(Math.E);
     public static Complex PI = new Complex(Math.PI);
-    public static Complex I = new Complex(0, 1);
-    public static Complex Inf = new Complex(Double.POSITIVE_INFINITY);
+    public static Complex I = new Complex(0, 1);//纯虚数i
+    public static Complex Inf = new Complex(Double.POSITIVE_INFINITY);//正无穷大
 
     public int err = 0;
-    public double re;
-    public double im;
+    public double re;//实部
+    public double im;//虚部
 
+    //存放无法正确处理情况的反馈
     private String answer = "";
 
     public Complex(double re_, double im_) {

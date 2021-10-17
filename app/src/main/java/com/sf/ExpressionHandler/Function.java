@@ -72,6 +72,8 @@ class Function {
 
     // Register name and serial pair
     // Different name may direct to same function
+    // 注册名称和序列号对
+    // 不同的名字可能指向同一个函数
     static final Serial[] funcList = {
             new Serial("exp", EXP),
             new Serial("ln", LN),
