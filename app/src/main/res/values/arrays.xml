@@ -5,4 +5,14 @@
         <item>美元</item>
         <item>日元</item>
     </string-array>
+    <string-array name="rateToRMB_type">
+        <item>1</item>
+        <item>6.434</item>
+        <item>0.05634</item>
+    </string-array>
+    <string-array name="rateFromRMB_type">
+        <item>1</item>
+        <item>0.1554</item>
+        <item>17.7495</item>
+    </string-array>
 </resources>

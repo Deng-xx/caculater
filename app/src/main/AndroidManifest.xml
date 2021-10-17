@@ -16,7 +16,8 @@
             android:parentActivityName=".MoreFunctionActivity"/>
         <activity
             android:name=".MoreFunctionActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:parentActivityName=".MainActivity"/>
         <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait"

@@ -6,4 +6,8 @@
     <string name="exchange_cal">汇率计算</string>
     <string name="principal_interest_cal">本金和利息计算</string>
     <string name="input_number">请输入数字</string>
+    <string name="repayment_choice">选择还款方式：</string>
+    <string name="repaydate_choice">选择贷款期限：</string>
+    <string name="interest_rate">输入年化利率：</string>
+
 </resources>

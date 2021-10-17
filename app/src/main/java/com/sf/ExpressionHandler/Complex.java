@@ -12,7 +12,19 @@ public class Complex {
     public double re;
     public double im;
 
+    public double getRe() {
+        return re;
+    }
+
+    public void setRe(String answer) {
+        re = Double.parseDouble(answer);
+    }
+
     private String answer = "";
+
+    public String getAnswer() {
+        return answer;
+    }
 
     public Complex(double re_, double im_) {
         re = re_;
