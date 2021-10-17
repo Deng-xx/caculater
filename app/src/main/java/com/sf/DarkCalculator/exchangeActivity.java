@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -11,10 +12,16 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.sf.ExpressionHandler.Complex;
+
 public class exchangeActivity extends AppCompatActivity {
     private TextView Text1;
     private TextView Text2;
     private String[] starArray;
+    private String[] rateToRMB;
+    private String[] rateFromRMB;
+    private Complex[] ToRMB = new Complex[50];
+    private Complex[] fromRMB= new Complex[50];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,11 +64,37 @@ public class exchangeActivity extends AppCompatActivity {
         @Override
         public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
             Toast.makeText(exchangeActivity.this, "您选择的是：" + starArray[i], Toast.LENGTH_SHORT).show();
+
         }
 
         @Override
         public void onNothingSelected(AdapterView<?> adapterView) {
 
         }
+    }
+
+    public void exchange(View view){
+        Text1= (TextView) findViewById(R.id.input_1);
+        Text2= (TextView) findViewById(R.id.input_2);
+        Spinner spIn = findViewById(R.id.spinnerIn);
+        Spinner spOut = findViewById(R.id.spinnerOut);
+        String offer= Text1.getText().toString();
+        String result= Text2.getText().toString();
+        Complex offered = new Complex(offer);
+        Complex answer = new Complex(result);//获取到textview的string并转换为complex类以便后续操作
+        Complex temp = new Complex();
+        rateToRMB=getResources().getStringArray(R.array.rateToRMB_type);
+        rateFromRMB=getResources().getStringArray(R.array.rateFromRMB_type);
+        for (int i=0;i<rateToRMB.length;i++){
+            ToRMB[i] = new Complex(rateToRMB[i]);
+            fromRMB[i]=new Complex(rateFromRMB[i]);
+        }   //把string数组资源转换为complex数组资源以便后续操作
+
+      int x1=(int) spIn.getSelectedItemId();
+      int x2=(int) spOut.getSelectedItemId();
+      answer=Complex.mul(offered,ToRMB[x1]);
+      answer=Complex.mul(answer,fromRMB[x2]);
+      Text2.setText(answer.toString());
+
     }
 }
