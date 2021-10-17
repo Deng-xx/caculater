@@ -2,6 +2,8 @@ package com.sf.DarkCalculator;
 
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
@@ -538,8 +540,29 @@ public class MainActivity extends BaseActivity {
                 return true;
             }
         });
+        menu.add("更多功能").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
+                dialog.setTitle("更多功能")
+                        .setMessage(R.string.app_more)
+                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.dismiss();
+                                Intent it = new Intent(MainActivity.this,MoreFunctionActivity.class);
+                                startActivity(it);
+                            }
+                        })
+                        .show();
+
+                return true;
+            }
+        });
         return true;
     }
+
+
 
     @Override
     public void onBackPressed() {
