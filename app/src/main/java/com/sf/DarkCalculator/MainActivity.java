@@ -58,8 +58,7 @@ public class MainActivity extends BaseActivity {
 
     private static final String[][] BUTTON = {
             {       "sqrt", "cbrt", "abs",
-                     "ln",
-                    "exp", "fact",
+                     "ln", "exp", "fact",
                     "sin", "cos", "tan",
                     "asin", "acos", "atan",
                     },
@@ -67,14 +66,13 @@ public class MainActivity extends BaseActivity {
                     }};
 
     private static final String[][] BUTTON_VICE = {
-            {"平方根", "立方根", "绝对值",
-                    "自然对数",
-                    "e底指数", "阶乘",
+            {       "平方根", "立方根", "绝对值",
+                    "自然对数", "e底指数", "阶乘",
                     "正弦", "余弦", "正切",
                     "反正弦", "反余弦", "反正切", "阶乘",
                     },
             {"上次运算",  "圆周率", "自然底数"}};
-
+    //正则表达式
     private static final Pattern FUNCTIONS_KEYWORDS = Pattern.compile(
             "\\b(" + "sqrt|cbrt|abs|lg|ln|exp|fact|" +
                     "sin|cos|tan|asin|acos|atan|Γ" + ")\\b");
@@ -415,6 +413,7 @@ public class MainActivity extends BaseActivity {
 
     }
 
+    //检测修改以及获取输入内容
     private boolean modified = true;
     private int selection = 0;
     private Thread calcThread;
@@ -450,7 +449,7 @@ public class MainActivity extends BaseActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (!modified) return;
+                if (!modified) return;//没有修改就返回
 
                 selection = inText.getSelectionStart();
                 s.clearSpans();

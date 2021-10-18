@@ -1,13 +1,11 @@
 package com.sf.ExpressionHandler;
 
-/**
- * Created by user on 2017/8/5.
- */
-
+//处理表达式
 public class ExpressionHandler {
 
     private static Expression expression = null;
 
+    //
     public static String[] calculation(String response) {
         try {
             expression = new Expression(response);

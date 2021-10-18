@@ -24,9 +24,9 @@
             <EditText
                 android:id="@+id/editText"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginBottom="54dp"
+                android:layout_height="128dp"
                 android:layout_marginTop="30dp"
+                android:layout_marginBottom="54dp"
                 android:background="@null"
                 android:fontFamily="sans-serif-light"
                 android:gravity="center_vertical|end"
