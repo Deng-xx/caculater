@@ -12,13 +12,7 @@ public class Complex {
     public double re;
     public double im;
 
-    public double getRe() {
-        return re;
-    }
 
-    public void setRe(String answer) {
-        re = Double.parseDouble(answer);
-    }
 
     private String answer = "";
 
@@ -144,6 +138,9 @@ public class Complex {
         double re = (a.re * ure + a.im * uim) / bNorm; // prevent overflow on bnorm^2
         double im = (a.im * ure - a.re * uim) / bNorm;
         return new Complex(re, im);
+    }
+    public static Complex divition(Complex a,Complex b){
+        return new Complex(a.re / b.re);
     }
 
     public static Complex pow(Complex a, Complex b) {

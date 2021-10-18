@@ -15,4 +15,34 @@
         <item>0.1554</item>
         <item>17.7495</item>
     </string-array>
+    <string-array name="payment_type">
+        <item>等额本金还款</item>
+        <item>等额本息还款</item>
+    </string-array>
+    <string-array name="Date">
+        <item>六个月</item>
+        <item>一年</item>
+        <item>两年</item>
+        <item>三年</item>
+        <item>四年</item>
+        <item>五年</item>
+        <item>十年</item>
+        <item>十五年</item>
+        <item>二十年</item>
+        <item>二十五年</item>
+        <item>三十年</item>
+    </string-array>
+    <integer-array name="DateNumber">
+        <item>6</item>
+        <item>12</item>
+        <item>24</item>
+        <item>36</item>
+        <item>48</item>
+        <item>60</item>
+        <item>120</item>
+        <item>180</item>
+        <item>240</item>
+        <item>300</item>
+        <item>360</item>
+    </integer-array>
 </resources>

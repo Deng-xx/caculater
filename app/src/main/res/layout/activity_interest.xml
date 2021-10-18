@@ -9,7 +9,7 @@
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
-        android:layout_height="48dp"
+        android:layout_height="40dp"
         android:layout_marginStart="16dp"
         android:layout_marginLeft="16dp"
         android:layout_marginTop="24dp"
@@ -19,13 +19,16 @@
 
     <Spinner
         android:id="@+id/choice_spinner"
-        android:layout_width="294dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
+        android:layout_width="280dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginLeft="32dp"
         android:layout_marginTop="24dp"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
+        android:entries="@array/payment_type"
+        android:spinnerMode="dropdown"
+        android:background="#E5E5E5"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/textView"
         app:layout_constraintTop_toTopOf="parent" />
@@ -33,7 +36,7 @@
     <TextView
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
-        android:layout_height="48dp"
+        android:layout_height="40dp"
         android:layout_marginStart="16dp"
         android:layout_marginLeft="16dp"
         android:layout_marginTop="24dp"
@@ -43,13 +46,16 @@
 
     <Spinner
         android:id="@+id/paydate_spinner"
-        android:layout_width="294dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
+        android:layout_width="280dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginLeft="32dp"
         android:layout_marginTop="24dp"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
+        android:entries="@array/Date"
+        android:spinnerMode="dropdown"
+        android:background="#E5E5E5"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/textView2"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
@@ -57,7 +63,7 @@
     <TextView
         android:id="@+id/textView3"
         android:layout_width="wrap_content"
-        android:layout_height="48dp"
+        android:layout_height="40dp"
         android:layout_marginStart="16dp"
         android:layout_marginLeft="16dp"
         android:layout_marginTop="24dp"
@@ -66,17 +72,17 @@
         app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
     <EditText
-        android:id="@+id/editTextTextPersonName"
-        android:layout_width="294dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
+        android:id="@+id/input_Rate"
+        android:layout_width="280dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginLeft="32dp"
         android:layout_marginTop="24dp"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
         android:ems="10"
-        android:inputType="textPersonName"
-        android:text="Name"
+        android:hint="输入数值即可"
+        android:inputType="phone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/textView3"
         app:layout_constraintTop_toBottomOf="@+id/textView2" />
@@ -87,19 +93,178 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="64dp"
         android:layout_marginLeft="64dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="16dp"
+        android:onClick="calculate"
         android:text="开始计算"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView3" />
+        app:layout_constraintTop_toBottomOf="@+id/textView10" />
+
+    <TextView
+        android:id="@+id/line"
+        android:layout_width="fill_parent"
+        android:layout_height="3px"
+        android:layout_marginTop="12dp"
+        android:background="#000000"
+        android:text="TextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button_start" />
 
     <Button
         android:id="@+id/button_reset"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="64dp"
         android:layout_marginRight="64dp"
+        android:onClick="reset"
         android:text="重置"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextTextPersonName" />
+        app:layout_constraintTop_toBottomOf="@+id/paymoney" />
+
+    <TextView
+        android:id="@+id/textViewMonth"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginLeft="32dp"
+        android:layout_marginTop="8dp"
+        android:text="首月还款："
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/line" />
+
+    <EditText
+        android:id="@+id/AllMoney"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginLeft="24dp"
+        android:layout_marginTop="20dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        app:layout_constraintStart_toEndOf="@+id/textViewAllMoney"
+        app:layout_constraintTop_toBottomOf="@+id/AllInterest" />
+
+    <TextView
+        android:id="@+id/textViewAllIntere"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginLeft="32dp"
+        android:layout_marginTop="20dp"
+        android:text="总需利息："
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewFirstPay" />
+
+    <EditText
+        android:id="@+id/AllInterest"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginLeft="24dp"
+        android:layout_marginTop="20dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        app:layout_constraintStart_toEndOf="@+id/textViewAllIntere"
+        app:layout_constraintTop_toBottomOf="@+id/month_dec" />
+
+    <EditText
+        android:id="@+id/month_dec"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginLeft="24dp"
+        android:layout_marginTop="20dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        app:layout_constraintStart_toEndOf="@+id/textViewFirstPay"
+        app:layout_constraintTop_toBottomOf="@+id/FirstPay" />
+
+    <EditText
+        android:id="@+id/FirstPay"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginLeft="24dp"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        app:layout_constraintStart_toEndOf="@+id/textViewMonth"
+        app:layout_constraintTop_toBottomOf="@+id/line" />
+
+    <TextView
+        android:id="@+id/textViewAllMoney"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginLeft="32dp"
+        android:layout_marginTop="20dp"
+        android:text="本息合计："
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewAllIntere" />
+
+    <TextView
+        android:id="@+id/textViewFirstPay"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginLeft="32dp"
+        android:layout_marginTop="20dp"
+        android:text="每月递减："
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewMonth" />
+
+    <TextView
+        android:id="@+id/textView10"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="24dp"
+        android:text="输入贷款金额："
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView3" />
+
+    <EditText
+        android:id="@+id/paymoney"
+        android:layout_width="280dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginLeft="32dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:ems="10"
+        android:hint="输入数值即可"
+        android:inputType="phone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/textView10"
+        app:layout_constraintTop_toBottomOf="@+id/input_Rate" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginLeft="32dp"
+        android:layout_marginTop="20dp"
+        android:text="每月支付："
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewAllMoney" />
+
+    <EditText
+        android:id="@+id/monthlyPay"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginLeft="24dp"
+        android:layout_marginTop="20dp"
+        android:ems="10"
+        android:hint="本金递减|本息不变"
+        android:inputType="textPersonName"
+        app:layout_constraintStart_toEndOf="@+id/textView4"
+        app:layout_constraintTop_toBottomOf="@+id/AllMoney" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

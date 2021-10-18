@@ -97,4 +97,5 @@ public class exchangeActivity extends AppCompatActivity {
       Text2.setText(answer.toString());
 
     }
+
 }
