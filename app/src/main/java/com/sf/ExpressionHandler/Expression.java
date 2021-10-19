@@ -7,17 +7,16 @@ import java.util.List;
 
 public class Expression {
     private String text;
-    private int[] br; // Bracket Depth括号深度
-    private int[] lastLB; // last left bracket of the same level同级的最后一个左括号
-    private int[] nextFS; // next functional symbol of the same level同级的下一个数学符号
-    private int[] commaCnt; // for each '(', how many comma belongs to it?对于每个 '('，有多少个逗号（多少对运算）属于它？
-    private int[] funcSer; // the function interpreted被解析的函数
-    private int brDiff; // the difference of ( and )左右括号差值，比如为1，代表有1个未匹配到右括号的左括号
+    private int[] br; // Bracket Depth
+    private int[] lastLB; // last left bracket of the same level
+    private int[] nextFS; // next functional symbol of the same level
+    private int[] commaCnt; // for each '(', how many comma belongs to it?
+    private int[] funcSer; // the function interpreted
+    private int brDiff; // the difference of ( and )
 
     // Cache interpretation result
-    //TODO:用于存放表达式转换的结果对的数据模型
     private class SymbolCachePair {
-        static final int SYMBOL_NUM = 0; // may cache value也用于存值
+        static final int SYMBOL_NUM = 0; // may cache value
         static final int SYMBOL_ADD = 1;
         static final int SYMBOL_POS = 2;
         static final int SYMBOL_SUB = 3;
@@ -27,16 +26,16 @@ public class Expression {
         static final int SYMBOL_MUL_OMIT = 7;
         static final int SYMBOL_POW = 8;
         static final int SYMBOL_SQRT = 9;
-        static final int SYMBOL_CONST = 10; // may cache value也用于存值
+        static final int SYMBOL_CONST = 10; // may cache value
         static final int SYMBOL_FUNC = 11;
-        static final int SYMBOL_VAR = 12; // Temporarily not used没用到
+        static final int SYMBOL_VAR = 12; // Temporarily not used
         static final int SYMBOL_BRACKET = 13;
         static final int SYMBOL_FACT = 14;
 
-        int end_pos;//该符号或结果位置？
-        int symbol;//符号对应枚举值
-        int symbol_pos;//符号位置，为-1时表示该位置为数
-        Complex cachedValue;//数值
+        int end_pos;
+        int symbol;
+        int symbol_pos;
+        Complex cachedValue;
 
         SymbolCachePair(int end_pos_, int symbol_, int symbol_pos_, Complex cachedValue_) {
             end_pos = end_pos_;
@@ -46,7 +45,6 @@ public class Expression {
         }
     }
 
-    //TODO:符号缓存对的接口
     private class SymbolCache {
         List<SymbolCachePair> list;
 
@@ -54,19 +52,16 @@ public class Expression {
             list = new ArrayList<>();
         }
 
-        //符号的提交函数
         void submit(int end_pos_, int symbol_, int symbol_pos_) {
             list.add(new SymbolCachePair(end_pos_, symbol_, symbol_pos_, new Complex()));
-            //Log.i("表达式：","Submit pos="+symbol_pos_+" type="+symbol_);调试用
+            //Log.i("expression","Submit pos="+symbol_pos_+" type="+symbol_);
         }
 
-        //数的提交函数
         void submit(int end_pos_, int symbol_, Complex cachedValue_) {
             list.add(new SymbolCachePair(end_pos_, symbol_, -1, cachedValue_));
-            //Log.i("表达式：","Submit val="+cachedValue_+" type="+symbol_);调试用
+            //Log.i("expression","Submit val="+cachedValue_+" type="+symbol_);
         }
 
-        //查找结果对操作
         SymbolCachePair checkCache(int end_pos) {
             for (int i = 0; i < list.size(); i++) {
                 SymbolCachePair pair = list.get(i);
@@ -78,16 +73,13 @@ public class Expression {
         }
     }
 
-    //定义解析结果变量
     private SymbolCache[] interpretResult;
 
-    //线程共享变量，用于判定是否处于工作
     private volatile boolean isWorking;
 
-    private static final String mathOperator = "+-*•/^√";    //基本运算符
-    private static Complex memValue = new Complex(); // TODO:for memory function用于储存值？
+    private static final String mathOperator = "+-*•/^√";
+    private static Complex memValue = new Complex(); // for memory function
 
-    //构造函数
     public Expression(String s) {
         text = s;
         br = new int[s.length() + 1];
@@ -96,8 +88,8 @@ public class Expression {
         commaCnt = new int[s.length() + 1];
         brDiff = 0;
 
-        int[] symbolStack = new int[s.length() + 1]; // a position stack of all left brackets所有左括号的位置的栈
-        int[] lastSymbol = new int[s.length() + 1]; // what's the position of the last symbol ?最近的运算符号的位置
+        int[] symbolStack = new int[s.length() + 1]; // a position stack of all left brackets
+        int[] lastSymbol = new int[s.length() + 1]; // what's the position of the last symbol ?
 
         int top = -1;
 
@@ -113,7 +105,7 @@ public class Expression {
                 if (c == ')') br[i]--;
             }
 
-            if (c == '(') { // push//压栈
+            if (c == '(') { // push
                 top++;
                 symbolStack[top] = i;
                 lastLB[i] = i;
@@ -137,8 +129,7 @@ public class Expression {
         }
     }
 
-    //初始化
-    private void initCache() {
+    private void initCache() { // init cache for evaluation
         funcSer = new int[text.length()];
         interpretResult = new SymbolCache[text.length()];
         for (int i = 0; i < interpretResult.length; i++) {
@@ -151,7 +142,7 @@ public class Expression {
         return mathOperator.indexOf(c) != -1;
     }
 
-    //仅在text[p]=='+'/'-'&&p>0时使用
+    // only used when text[p]=='+'/'-' && p>0
     private boolean isAddSubSymbol(int p) {
         if (p == 0) return false;
 
@@ -164,22 +155,21 @@ public class Expression {
         if (isOperator(cj) || cj == 'E') {
             return false;
         }
-        //TODO:看到这里了
-        if (ParseNumber.isBaseSymbol(cj)) { // a pos/neg symbol in scientific notation under certain base在特定基数下以科学记数法表示的正负号
+        if (ParseNumber.isBaseSymbol(cj)) { // a pos/neg symbol in scientific notation under certain base
             int pos;
             for (pos = p + 1; pos < text.length(); pos++) {
                 cj = text.charAt(pos);
-                if (!(cj >= '0' && cj <= '9')) { //不是十进制数
+                if (!(cj >= '0' && cj <= '9')) { // not a decimal number
                     break;
                 }
             }
-            if (pos == text.length()) { //解析到了最后
+            if (pos == text.length()) { // parsed to an end
                 return false;
             }
-            if (pos == p + 1) { //正负号后接非整数符号
+            if (pos == p + 1) { // '+/-' directly followed by non-integer symbol
                 return true;
             }
-            if (ParseNumber.isBaseSymbol(cj) || (cj >= 'A' && cj <= 'F') || cj == '.') { //其他符号
+            if (ParseNumber.isBaseSymbol(cj) || (cj >= 'A' && cj <= 'F') || cj == '.') { // part of another notation
                 return true;
             }
             return false;
@@ -268,10 +258,10 @@ public class Expression {
             }
         }
 
-        // 解析表达式
+        // Interpret expression
         String s = text.substring(l, r + 1);
 
-        // 变量x
+        // Variable
         if (s.equals("x") && (vX.isValid() || vX.isNaN())) return new Result(vX); // variable X
         if (s.equals("reg")) return new Result(memValue); // reg value
 
@@ -655,7 +645,7 @@ public class Expression {
         return new Result(1).setAnswer("函数 “" + Function.funcList[listPos].funcName + "” 参数错误");
     }
 
-    public Result value() { //入口!
+    public Result value() { // Entrance !
         isWorking = true;
         isIntegOverTolerance = false;
         isDiffOverTolerance = false;
@@ -664,7 +654,7 @@ public class Expression {
         }
 
         // Start working
-        // 0+NaNi is a sign for "No Variable X provided" initially
+        // 0+NaNi id a sign for "No Variable X provided" initially
         initCache();
         Result res = value(0, text.length() - 1, new Complex(0, Double.NaN));
         return res;

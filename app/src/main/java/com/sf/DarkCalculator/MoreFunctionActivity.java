@@ -21,5 +21,9 @@ public class MoreFunctionActivity extends BaseActivity {
         Intent intent = new Intent(this,interestActivity.class);
         startActivity(intent);
     }
+    public void goToreduced(View view){
+        Intent intent = new Intent(this,ReducedActivity.class);
+        startActivity(intent);
+    }
 
 }

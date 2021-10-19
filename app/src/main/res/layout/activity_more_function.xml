@@ -10,10 +10,11 @@
         android:id="@+id/exchangeBut"
         android:layout_width="308dp"
         android:layout_height="82dp"
+        android:layout_marginTop="88dp"
         android:onClick="goToExchange"
         android:text="@string/exchange_cal"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -21,10 +22,23 @@
         android:id="@+id/principalbut"
         android:layout_width="308dp"
         android:layout_height="82dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="60dp"
         android:onClick="goTointerest"
         android:text="@string/principal_interest_cal"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/exchangeBut" />
+
+    <Button
+        android:id="@+id/gotoreduced"
+        android:layout_width="308dp"
+        android:layout_height="82dp"
+        android:layout_marginTop="408dp"
+        android:onClick="goToreduced"
+        android:text="@string/reduced"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/exchangeBut" />
 </androidx.constraintlayout.widget.ConstraintLayout>

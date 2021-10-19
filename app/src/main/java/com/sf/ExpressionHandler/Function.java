@@ -1,8 +1,6 @@
 package com.sf.ExpressionHandler;
 
-/**
- * Created by Iraka Crow on 2017/3/25.
- */
+
 
 class Function {
     static final int EXP = 10;

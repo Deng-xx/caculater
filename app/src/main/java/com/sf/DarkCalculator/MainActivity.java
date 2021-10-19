@@ -100,6 +100,7 @@ public class MainActivity extends BaseActivity {
         context = this;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //初始化各个组件
         initToolBar();
         initEditText();
         initTextView();
@@ -112,7 +113,7 @@ public class MainActivity extends BaseActivity {
         initOperator();
         initFunction();
     }
-
+    //初始化DELETE按钮
     private void initDelete() {
         delete = (FrameLayout) findViewById(R.id.delete);
         delete.setOnClickListener(new View.OnClickListener() {
@@ -138,7 +139,7 @@ public class MainActivity extends BaseActivity {
             }
         });
     }
-
+    //初始化左上角文字框
     private void initTextView() {
         stateText = (TextView) findViewById(R.id.text_state);
         stateText.setOnClickListener(new View.OnClickListener() {

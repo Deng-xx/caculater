@@ -5,6 +5,7 @@
     <string name="app_more">更多的功能，包括了汇率转换以及精度更高的本金和本息计算等</string>
     <string name="exchange_cal">汇率计算</string>
     <string name="principal_interest_cal">本金和利息计算</string>
+    <string name="reduced">单位换算</string>
     <string name="input_number">请输入数字</string>
     <string name="repayment_choice">选择还款方式：</string>
     <string name="repaydate_choice">选择贷款期限：</string>
