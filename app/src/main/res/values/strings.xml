@@ -1,8 +1,10 @@
 <resources>
     <string name="app_name">pp计算器</string>
 
-    <string name="app_help">实现了基础的运算和相关函数的定义</string>
-    <string name="app_more">更多的功能，包括了汇率转换以及精度更高的本金和本息计算等</string>
+    <string name="app_help">实现了基础的运算</string>
+    <string name="app_more">更多的功能，包括了汇率转换以及精度更高的本金、本息计算、单位换算和科学计算等</string>
+    <string name="science_cal">科学计算</string>
+    <string name="science_help">实现了基础运算、复数运算、科学计数法和相关函数</string>
     <string name="exchange_cal">汇率计算</string>
     <string name="principal_interest_cal">本金和利息计算</string>
     <string name="reduced">单位换算</string>

@@ -98,7 +98,7 @@ public class Complex {
     }
 
     public Complex norm() {
-        return new Complex(Math.hypot(re, im));
+        return new Complex(Math.hypot(re, im));//返回re^2+im^2
     }
 
     public Complex arg() {
@@ -120,6 +120,7 @@ public class Complex {
         return !(isDoubleFinite(re) && Double.isNaN(im));
     }
 
+    //当d不为无穷小也不为无穷大时返回true
     public static boolean isDoubleFinite(double d) {
         return !(Double.isNaN(d) || Double.isInfinite(d));
     }
@@ -131,7 +132,7 @@ public class Complex {
     public static Complex div(Complex a, Complex b) {
         double aNorm = a.norm().re;
         double bNorm = b.norm().re;
-        if (aNorm > 0 && bNorm == 0) return Inf; // pInf==nInf in complex field?
+        if (aNorm > 0 && bNorm == 0) return Inf; //分母实数化后分母bNorm为0
         if (Double.isInfinite(bNorm) && Complex.isDoubleFinite(aNorm)) return new Complex(0);
         double ure = b.re / bNorm; // prevent overflow on a.re*b.re
         double uim = b.im / bNorm;

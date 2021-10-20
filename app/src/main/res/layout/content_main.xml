@@ -26,10 +26,11 @@
             android:foreground="?android:attr/selectableItemBackground">
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:fontFamily="sans-serif-light"
+                android:gravity="center"
                 android:text="DEL"
                 android:textColor="@color/colorWhite"
                 android:textSize="20sp" />
@@ -38,8 +39,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
-                android:paddingRight="12dp"
                 android:paddingTop="6dp"
+                android:paddingRight="12dp"
                 android:text="CLR"
                 android:textColor="@color/colorWhite"
                 android:textSize="12sp" />
@@ -54,14 +55,5 @@
 
     </LinearLayout>
 
-
-    <ImageView
-        android:id="@+id/drawer_right"
-        android:layout_width="20dp"
-        android:layout_height="match_parent"
-        android:background="#bdbdbd"
-        android:elevation="4dp"
-        android:gravity="center"
-        android:src="@drawable/ic_left" />
 
 </LinearLayout>

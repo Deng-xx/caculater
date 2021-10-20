@@ -11,14 +11,14 @@ import java.util.List;
 public class MainPagerAdapter extends PagerAdapter {
     private List<View> pageList;
 
-    @Override
-    public boolean isViewFromObject(View view, Object object) {
-        return view == object;
-    }
-
     public MainPagerAdapter(List<View> pageList) {
         super();
         this.pageList = pageList;
+    }
+
+    @Override
+    public boolean isViewFromObject(View view, Object object) {
+        return view == object;
     }
 
     @Override

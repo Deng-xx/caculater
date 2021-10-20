@@ -9,7 +9,7 @@
     <TextView
         android:id="@+id/text_item"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_gravity="center"
         android:fontFamily="sans-serif-light"
         android:textColor="@color/colorWhite"
@@ -20,8 +20,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="right"
-        android:paddingRight="12dp"
         android:paddingTop="6dp"
+        android:paddingRight="12dp"
         android:textColor="@color/colorWhite"
         android:textSize="18sp" />
 

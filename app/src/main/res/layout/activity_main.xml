@@ -74,45 +74,6 @@
 
         <include layout="@layout/content_main" />
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="start"
-            android:background="#bdbdbd">
-
-            <GridView
-                android:id="@+id/sideBar"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:numColumns="1" />
-
-        </FrameLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="end"
-            android:background="#bdbdbd"
-            android:orientation="vertical">
-
-            <com.google.android.material.tabs.TabLayout
-                android:id="@+id/tabs_main"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#bdbdbd"
-                android:elevation="2dp"
-                app:tabIndicatorColor="#424242"
-                app:tabSelectedTextColor="#212121"
-                app:tabTextAppearance="@style/TabLayoutTextStyle"
-                app:tabTextColor="#616161" />
-
-            <androidx.viewpager.widget.ViewPager
-                android:id="@+id/viewPager_drawer"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-
-        </LinearLayout>
-
     </androidx.drawerlayout.widget.DrawerLayout>
 
 </LinearLayout>
