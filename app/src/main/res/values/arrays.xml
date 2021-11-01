@@ -4,16 +4,25 @@
         <item>人民币</item>
         <item>美元</item>
         <item>日元</item>
+        <item>欧元</item>
+        <item>英镑</item>
+        <item>加元</item>
     </string-array>
     <string-array name="rateToRMB_type">
         <item>1</item>
         <item>6.434</item>
         <item>0.05634</item>
+        <item>7.4025</item>
+        <item>8.7638</item>
+        <item>5.1743</item>
     </string-array>
     <string-array name="rateFromRMB_type">
         <item>1</item>
         <item>0.1554</item>
         <item>17.7495</item>
+        <item>0.1351</item>
+        <item>0.1141</item>
+        <item>0.1933</item>
     </string-array>
     <string-array name="payment_type">
         <item>等额本金还款</item>

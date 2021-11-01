@@ -83,6 +83,7 @@
         android:ems="10"
         android:hint="输入数值即可"
         android:inputType="phone"
+        android:selectAllOnFocus="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/textView3"
         app:layout_constraintTop_toBottomOf="@+id/textView2" />
@@ -142,6 +143,7 @@
         android:layout_marginLeft="24dp"
         android:layout_marginTop="20dp"
         android:ems="10"
+        android:selectAllOnFocus="true"
         android:inputType="textPersonName"
         app:layout_constraintStart_toEndOf="@+id/textViewAllMoney"
         app:layout_constraintTop_toBottomOf="@+id/AllInterest" />
@@ -165,6 +167,7 @@
         android:layout_marginLeft="24dp"
         android:layout_marginTop="20dp"
         android:ems="10"
+        android:selectAllOnFocus="true"
         android:inputType="textPersonName"
         app:layout_constraintStart_toEndOf="@+id/textViewAllIntere"
         app:layout_constraintTop_toBottomOf="@+id/month_dec" />
@@ -177,6 +180,7 @@
         android:layout_marginLeft="24dp"
         android:layout_marginTop="20dp"
         android:ems="10"
+        android:selectAllOnFocus="true"
         android:inputType="textPersonName"
         app:layout_constraintStart_toEndOf="@+id/textViewFirstPay"
         app:layout_constraintTop_toBottomOf="@+id/FirstPay" />
@@ -189,6 +193,7 @@
         android:layout_marginLeft="24dp"
         android:layout_marginTop="8dp"
         android:ems="10"
+        android:selectAllOnFocus="true"
         android:inputType="textPersonName"
         app:layout_constraintStart_toEndOf="@+id/textViewMonth"
         app:layout_constraintTop_toBottomOf="@+id/line" />
@@ -238,6 +243,7 @@
         android:ems="10"
         android:hint="输入数值即可"
         android:inputType="phone"
+        android:selectAllOnFocus="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/textView10"
         app:layout_constraintTop_toBottomOf="@+id/input_Rate" />
@@ -262,6 +268,7 @@
         android:layout_marginTop="20dp"
         android:ems="10"
         android:hint="本金递减|本息不变"
+        android:selectAllOnFocus="true"
         android:inputType="textPersonName"
         app:layout_constraintStart_toEndOf="@+id/textView4"
         app:layout_constraintTop_toBottomOf="@+id/AllMoney" />

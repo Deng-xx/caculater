@@ -78,6 +78,11 @@ public class exchangeActivity extends AppCompatActivity {
         Spinner spOut = findViewById(R.id.spinnerOut);
         String offer= Text1.getText().toString();
         String result= Text2.getText().toString();
+        if(offer.length()==0)
+        {
+            Text2.setText(null);
+            return;
+        }
         Complex offered = new Complex(offer);
         Complex answer = new Complex(result);//获取到textview的string并转换为complex类以便后续操作
         Complex temp = new Complex();
@@ -90,8 +95,13 @@ public class exchangeActivity extends AppCompatActivity {
 
       int x1=(int) spIn.getSelectedItemId();
       int x2=(int) spOut.getSelectedItemId();
-      answer=Complex.mul(offered,ToRMB[x1]);
-      answer=Complex.mul(answer,fromRMB[x2]);
+        answer=Complex.mul(offered,ToRMB[x1]);
+        answer=Complex.mul(answer,fromRMB[x2]);
+        if(x1==x2){
+            answer=Complex.mul(offered,new Complex(1));
+        }
+
+
       Text2.setText(answer.toString());
 
     }

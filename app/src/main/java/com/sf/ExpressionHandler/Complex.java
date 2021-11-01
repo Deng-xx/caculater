@@ -140,9 +140,6 @@ public class Complex {
         double im = (a.im * ure - a.re * uim) / bNorm;
         return new Complex(re, im);
     }
-    public static Complex divition(Complex a,Complex b){
-        return new Complex(a.re / b.re);
-    }
 
     public static Complex pow(Complex a, Complex b) {
         if (a.re == 0 && a.im == 0) { // special treatment for 0
