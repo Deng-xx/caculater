@@ -12,13 +12,8 @@ public class Complex {
     public double re;
     public double im;
 
-
-
     private String answer = "";
 
-    public String getAnswer() {
-        return answer;
-    }
 
     public Complex(double re_, double im_) {
         re = re_;
@@ -40,18 +35,6 @@ public class Complex {
         im = 0;
     }
 
-    public Complex(String answer_, Complex c) {
-        answer = answer_;
-        re = c.re;
-        im = c.im;
-    }
-
-    public Complex(boolean b) {
-        re = b ? 1 : 0;
-        im = 0;
-        answer = b ? "true" : "false";
-    }
-
     public Complex() {
         re = Double.NaN;
         im = Double.NaN;
@@ -66,18 +49,22 @@ public class Complex {
         this.answer = str;
     }
 
+    //加
     public static Complex add(Complex a, Complex b) {
         return new Complex(a.re + b.re, a.im + b.im);
     }
 
+    //减
     public static Complex sub(Complex a, Complex b) {
         return new Complex(a.re - b.re, a.im - b.im);
     }
 
+    //取反
     public static Complex inv(Complex a) {
         return new Complex(-a.re, -a.im);
     }
 
+    //乘
     public static Complex mul(Complex a, Complex b) {
         return new Complex(
                 a.re * b.re - a.im * b.im,
@@ -85,35 +72,31 @@ public class Complex {
         );
     }
 
+    //绝对值
     public Complex abs() {
         if (im != 0)
             return new Complex().error(3);
         return new Complex(Math.abs(re));
     }
 
-    public double norm2() {
-        if (Double.isInfinite(re) || Double.isInfinite(im))
-            return Double.POSITIVE_INFINITY;
-        return re * re + im * im;
-    }
-
+    //返回re^2+im^2
     public Complex norm() {
-        return new Complex(Math.hypot(re, im));//返回re^2+im^2
+        return new Complex(Math.hypot(re, im));
     }
 
     public Complex arg() {
-        // deal with the difference between 0 and -0
-        // but better solution shall be discussed
+
         if (im == 0) {
-            im = 0; // -0 -> 0
-            if (re == 0) // the arg of 0 is not determined
+            im = 0;
+            if (re == 0)
                 return new Complex(Double.NaN);
         }
         return new Complex(Math.atan2(im, re));
     }
 
+    //不管虚部
     public boolean isNaN() {
-        return Double.isNaN(re); // im is not cared
+        return Double.isNaN(re);
     }
 
     public boolean isValid() { // finite complex or Complex Infinity
@@ -125,38 +108,37 @@ public class Complex {
         return !(Double.isNaN(d) || Double.isInfinite(d));
     }
 
-    public boolean isFinite() {
-        return Complex.isDoubleFinite(re) && Complex.isDoubleFinite(im);
-    }
-
+    //除
     public static Complex div(Complex a, Complex b) {
         double aNorm = a.norm().re;
         double bNorm = b.norm().re;
         if (aNorm > 0 && bNorm == 0) return Inf; //分母实数化后分母bNorm为0
         if (Double.isInfinite(bNorm) && Complex.isDoubleFinite(aNorm)) return new Complex(0);
-        double ure = b.re / bNorm; // prevent overflow on a.re*b.re
+        double ure = b.re / bNorm;
         double uim = b.im / bNorm;
-        double re = (a.re * ure + a.im * uim) / bNorm; // prevent overflow on bnorm^2
+        double re = (a.re * ure + a.im * uim) / bNorm;
         double im = (a.im * ure - a.re * uim) / bNorm;
         return new Complex(re, im);
     }
 
+    //指数
     public static Complex pow(Complex a, Complex b) {
-        if (a.re == 0 && a.im == 0) { // special treatment for 0
+        if (a.re == 0 && a.im == 0) { //先把0的情况处理了
             if (b.re > 0) return new Complex(0);
             else if (b.re < 0 && b.im == 0) return Complex.Inf;
             else return new Complex();
         }
-        if (a.norm().re < 1 && b.re == Double.POSITIVE_INFINITY) { // special treatment for inf
+        if (a.norm().re < 1 && b.re == Double.POSITIVE_INFINITY) { //处理正无穷小
             return new Complex(0);
         }
-        if (a.norm().re > 1 && b.re == Double.NEGATIVE_INFINITY) { // special treatment for -inf
+        if (a.norm().re > 1 && b.re == Double.NEGATIVE_INFINITY) { //处理负无穷小
             return new Complex(0);
         }
 
         return Complex.exp(Complex.mul(b, Complex.ln(a)));
     }
 
+    //转换字符串
     private static String doubleToString(double d) {
         if (Double.isNaN(d)) {
             return "nan";
@@ -172,13 +154,14 @@ public class Complex {
         return ParseNumber.toBaseString(d, Result.base, Result.precision);
     }
 
+    //拼答案字符串
     public String toString() {
         if (!TextUtils.isEmpty(answer))
             return answer;
         double threshold = (Result.precision < Result.maxPrecision ? Math.pow(Result.base, -Result.precision) : 0);
         if (Double.isNaN(im) && Double.isInfinite(re)) {
             answer = (re > 0 ? "∞" : "-∞");
-        } else if (Math.abs(re) > threshold || Double.isNaN(re)) { // re to be shown.
+        } else if (Math.abs(re) > threshold || Double.isNaN(re)) {
             answer += doubleToString(re);
 
             if (isDoubleFinite(im)) {
@@ -189,8 +172,8 @@ public class Complex {
                     }
                     answer += "i";
                 }
-            } else { // inf or nan
-                answer += (im < 0 ? "" : "+"); // +inf/nan -> +
+            } else { // 无穷大或者无穷小
+                answer += (im < 0 ? "" : "+");
                 answer += doubleToString(im) + "*i";
             }
         } else {
@@ -201,33 +184,17 @@ public class Complex {
                         answer += doubleToString(Math.abs(im));
                     }
                     answer += "i";
-                } else { // Nothing
+                } else {//补精度
                     answer += "0";
                 }
-            } else { // inf nan
+            } else {//无穷大或者无穷小情况
                 answer += doubleToString(im) + "*i";
             }
         }
         return answer;
     }
 
-    //======================= Functions ============================
-
-    public static Complex logab(Complex c, Complex c2) {
-        return div(ln(c2), ln(c));
-    }
-
-    public static Complex max(Complex c, Complex c2) {
-        if (c.im != 0 || c2.im != 0)
-            return new Complex().error(3);
-        return new Complex(Math.max(c.re, c2.re));
-    }
-
-    public static Complex min(Complex c, Complex c2) {
-        if (c.im != 0 || c2.im != 0)
-            return new Complex().error(3);
-        return new Complex(Math.min(c.re, c2.re));
-    }
+    //======================= 函数方法 ============================
 
     public static Complex ln(Complex c) {
         return new Complex(Math.log(c.norm().re), c.arg().re);
@@ -240,14 +207,10 @@ public class Complex {
         return new Complex(norm * Math.cos(c.im), norm * Math.sin(c.im));
     }
 
-    public static Complex log(Complex c) {
-        return div(ln(c), ln(new Complex(10)));
-    }
-
     public static Complex sqrt(Complex c) {
         double norm = c.norm().re;
         if (norm == 0) return new Complex(0);
-        double cosArg = c.re / norm; // invalid for 0
+        double cosArg = c.re / norm;
         double sind2 = Math.sqrt((1 - cosArg) / 2);
         double cosd2 = Math.sqrt((1 + cosArg) / 2);
         if (c.im < 0) sind2 = -sind2;
@@ -272,7 +235,7 @@ public class Complex {
     }
 
     public static Complex tan(Complex c) {
-        //return Complex.div(Complex.sin(c),Complex.cos(c)); // not precise enough
+
         double re2 = c.re * 2;
         double im2 = c.im * 2;
 
@@ -281,7 +244,7 @@ public class Complex {
         double sinhi2 = (eip2 - ein2) / 2;
         double coshi2 = (eip2 + ein2) / 2;
 
-        if (Double.isInfinite(coshi2)) { // Special case
+        if (Double.isInfinite(coshi2)) { //特殊情况
             return new Complex(0, c.im > 0 ? 1 : -1);
         }
 
@@ -311,84 +274,5 @@ public class Complex {
         double im_ = (Math.log(c2.norm().re) - Math.log(c1.norm().re)) / 2;
         return new Complex(re_, im_);
     }
-
-    private static double[] gammaP = { // constants for Lanczos approximation
-            676.5203681218851, -1259.1392167224028, 771.32342877765313,
-            -176.61502916214059, 12.507343278686905, -0.13857109526572012,
-            9.9843695780195716E-6, 1.5056327351493116E-7
-    };
-    private static double[] gammaT = { // constants for Taylor approximation
-            -0.57721566490153286, 0.9890559953279725, 0.9074790760808862,
-            0.9817280868344002, 0.9819950689031453, 0.9931491146212761
-    };
-
-    public static Complex gamma(Complex c) { // Lanczos approximation + Taylor series
-
-        if (c.re == Double.POSITIVE_INFINITY && c.im == 0) return Complex.Inf;
-        //if(c.re==Double.NEGATIVE_INFINITY)return new Complex();
-
-        Complex result;
-
-        if (c.re < -310) { // guarantee result in double field
-            if (c.re == Double.NEGATIVE_INFINITY) {
-                if (c.im == 0)
-                    result = new Complex();
-                else
-                    result = new Complex(0);
-
-            } else if (c.re == Math.floor(c.re) && c.im == 0) {
-                result = Complex.Inf;
-            } else {
-                result = new Complex(0);
-            }
-        } else if (c.re < -0.5) { // negative x complex plane
-            int k = (int) Math.floor(-c.re) + 1;
-            result = Complex.gamma(new Complex(c.re + k, c.im));
-            for (int i = k - 1; i >= 0; i--) { // reversed order, prevent 0/0 -> NaN
-                if (!result.isFinite()) break;
-                result = Complex.div(result, new Complex(c.re + i, c.im));
-            }
-        } else if (c.re > 142) { // big numbers
-            double kd = Math.ceil(c.re - 142);
-            long k = (long) kd;
-            result = Complex.gamma(new Complex(c.re - kd, c.im));
-            if (result.re != 0 || result.im != 0) {
-                for (long i = 1; i <= k; i++) {
-                    if (!result.isFinite()) break;
-                    result = Complex.mul(result, new Complex(c.re - i, c.im));
-                }
-            }
-        } else if (Math.abs(c.re) < 1E-3 && Math.abs(c.im) < 1E-2) { // Taylor series, deal with value REALLY near the pole 0
-            result = new Complex(0);
-            for (int i = gammaT.length - 1; i >= 0; i--) {
-                result = Complex.mul(result, c);
-                result = new Complex(result.re + gammaT[i], result.im);
-            }
-            result = Complex.add(result, Complex.div(new Complex(1), c));
-        } else if (c.re < 0.5 && Math.abs(c.im) <= 220) { // Reflection formula(more precise), deal with value near the pole 0
-            Complex sZ = Complex.sin(Complex.mul(Complex.PI, c));
-            Complex gZ = Complex.gamma(Complex.sub(new Complex(1), c));
-            //Log.i("Gamma","sZ="+sZ+" gZ="+gZ);
-            result = Complex.div(Complex.PI, Complex.mul(sZ, gZ));
-        } else {
-            Complex z = new Complex(c.re - 1, c.im);
-            Complex x = new Complex(0.99999999999980993);
-
-            for (int i = 0; i < gammaP.length; i++) {
-                Complex dn = new Complex(z.re + i + 1, z.im);
-                x = Complex.add(x, Complex.div(new Complex(gammaP[i]), dn));
-            }
-
-            Complex t = new Complex(z.re + gammaP.length - 0.5, z.im);
-            result = Complex.exp(Complex.mul(new Complex(z.re + 0.5, z.im), Complex.ln(t)));
-            result = Complex.mul(new Complex(Math.sqrt(2 * Math.PI)), result);
-            result = Complex.mul(Complex.exp(Complex.inv(t)), result);
-            result = Complex.mul(result, x);
-        }
-        if (Double.isInfinite(result.re) && !Complex.isDoubleFinite(result.im))
-            result.im = Double.NaN;
-        return result;
-    }
-
 
 }

@@ -52,7 +52,7 @@ public class ScienceActivity extends BaseActivity {
             "ln", "exp", "fact", "7", "8", "9", "-",
             "sin", "cos", "tan", "4", "5", "6", "+",
             "asin", "acos", "atan", "1", "2", "3", "=",
-            "<", ">", "i", "%", "0", ".", "null"
+            "<", ">", "i", "%", "0", ".", "!"
     };
 
     //按钮中文显示
@@ -62,7 +62,7 @@ public class ScienceActivity extends BaseActivity {
             "自然对数", "e底指数", "阶乘", "7就是7", "8就是8", "9就是9", "减号",
             "正弦", "余弦", "正切", "4就是4", "5就是5", "6就是6", "加号",
             "反正弦", "反余弦", "反正切", "1不认识？", "2就是2", "3就是3", "等号",
-            "往左移", "往右移", "复数i", "百分号", "00000", "小数点儿", "没想到按什么！"
+            "往左移", "往右移", "复数i", "百分号", "00000", "小数点儿", "阶乘"
     };
     //正则表达式
     private static final Pattern FUNCTIONS_KEYWORDS = Pattern.compile(
@@ -213,14 +213,6 @@ public class ScienceActivity extends BaseActivity {
                 return true;
             }
         });
-        menu.add("返回").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                Intent it = new Intent(ScienceActivity.this, MainActivity.class);
-                startActivity(it);
-                return true;
-            }
-        });
         menu.add("更多功能").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -285,7 +277,7 @@ public class ScienceActivity extends BaseActivity {
                 @Override
                 public void run() {
                     if (value[1].equals("true")) {
-                        outText.setTextColor(0xffff4081);//粉红色
+                        outText.setTextColor(0xffff4081);
                         outText.setText(value[0]);
                     } else {
                         Constants.setAns(value[0]);

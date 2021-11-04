@@ -6,17 +6,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Expression {
-    private String text;
-    private int[] br; // Bracket Depth
-    private int[] lastLB; // last left bracket of the same level
-    private int[] nextFS; // next functional symbol of the same level
-    private int[] commaCnt; // for each '(', how many comma belongs to it?
-    private int[] funcSer; // the function interpreted
-    private int brDiff; // the difference of ( and )
+    private String text;//存放输入框文本
+    private int[] br; //括号深度
+    private int[] lastLB; //同优先级别的最近的一个左括号
+    private int[] nextFS; //同级别的下一个运算符或者函数标志
+    private int[] commaCnt; //每个左括号的逗号数，用于提取函数参数
+    private int[] funcSer; //解释出来的函数参数
+    private int brDiff; // 左右括号的差值，少一个
 
-    // Cache interpretation result
+    //缓存解析结果的标志
     private class SymbolCachePair {
-        static final int SYMBOL_NUM = 0; // may cache value
+        static final int SYMBOL_NUM = 0; //可能缓存值
         static final int SYMBOL_ADD = 1;
         static final int SYMBOL_POS = 2;
         static final int SYMBOL_SUB = 3;
@@ -26,17 +26,17 @@ public class Expression {
         static final int SYMBOL_MUL_OMIT = 7;
         static final int SYMBOL_POW = 8;
         static final int SYMBOL_SQRT = 9;
-        static final int SYMBOL_CONST = 10; // may cache value
+        static final int SYMBOL_CONST = 10; //可能缓存值
         static final int SYMBOL_FUNC = 11;
-        static final int SYMBOL_VAR = 12; // Temporarily not used
         static final int SYMBOL_BRACKET = 13;
         static final int SYMBOL_FACT = 14;
 
-        int end_pos;
-        int symbol;
-        int symbol_pos;
-        Complex cachedValue;
+        int end_pos;//缓存解释到的最后位置
+        int symbol;//缓存符号或运算符
+        int symbol_pos;//该缓存符号在字符串中的位置
+        Complex cachedValue;//缓存结果
 
+        //缓存符号结果对，是保存缓存结果的数据模型
         SymbolCachePair(int end_pos_, int symbol_, int symbol_pos_, Complex cachedValue_) {
             end_pos = end_pos_;
             symbol = symbol_;
@@ -45,6 +45,7 @@ public class Expression {
         }
     }
 
+    //符号缓存，封装了缓存结果对的模型
     private class SymbolCache {
         List<SymbolCachePair> list;
 
@@ -78,18 +79,18 @@ public class Expression {
     private volatile boolean isWorking;
 
     private static final String mathOperator = "+-*•/^√";
-    private static Complex memValue = new Complex(); // for memory function
+    private static Complex memValue = new Complex(); //用于保存值来完成储存ANS功能
 
     public Expression(String s) {
-        text = s;
+        text = s;//输入框的文本
         br = new int[s.length() + 1];
         lastLB = new int[s.length() + 1];
         nextFS = new int[s.length() + 1];
         commaCnt = new int[s.length() + 1];
         brDiff = 0;
 
-        int[] symbolStack = new int[s.length() + 1]; // a position stack of all left brackets
-        int[] lastSymbol = new int[s.length() + 1]; // what's the position of the last symbol ?
+        int[] symbolStack = new int[s.length() + 1]; //所有左括号位置的栈
+        int[] lastSymbol = new int[s.length() + 1]; //最后一个符号标志枚举值
 
         int top = -1;
 
@@ -105,21 +106,21 @@ public class Expression {
                 if (c == ')') br[i]--;
             }
 
-            if (c == '(') { // push
+            if (c == '(') { //是左括号压栈
                 top++;
                 symbolStack[top] = i;
                 lastLB[i] = i;
                 lastSymbol[top] = i;
                 brDiff++;
             }
-            if (c == ',' && top >= 0) { // record
+            if (c == ',' && top >= 0) { //记录
                 lastLB[i] = symbolStack[top];
                 commaCnt[symbolStack[top]]++;
                 nextFS[lastSymbol[top]] = i;
                 lastSymbol[top] = i;
             }
             if (c == ')') {
-                if (top >= 0) { // pop
+                if (top >= 0) { //右括号出栈
                     lastLB[i] = symbolStack[top];
                     nextFS[lastSymbol[top]] = i;
                     top--;
@@ -129,7 +130,7 @@ public class Expression {
         }
     }
 
-    private void initCache() { // init cache for evaluation
+    private void initCache() { //初始化缓存
         funcSer = new int[text.length()];
         interpretResult = new SymbolCache[text.length()];
         for (int i = 0; i < interpretResult.length; i++) {
@@ -138,38 +139,39 @@ public class Expression {
         }
     }
 
+    //判断c字符是否是mathOperator，是返回true
     private boolean isOperator(char c) {
         return mathOperator.indexOf(c) != -1;
     }
 
-    // only used when text[p]=='+'/'-' && p>0
+    //判断是否text[p]=='+'/'-' && p>0 && 逻辑合理,p是position
     private boolean isAddSubSymbol(int p) {
         if (p == 0) return false;
 
         char cj = text.charAt(p);
-        if (!(cj == '+' || cj == '-')) {
+        if (!(cj == '+' || cj == '-')) {//不是加减返回false
             return false;
         }
 
-        cj = text.charAt(p - 1);
+        cj = text.charAt(p - 1);//p-1位置还是操作符或者是科学记数法返回false
         if (isOperator(cj) || cj == 'E') {
             return false;
         }
-        if (ParseNumber.isBaseSymbol(cj)) { // a pos/neg symbol in scientific notation under certain base
+        if (ParseNumber.isBaseSymbol(cj)) { //特定基数下科学记数法中的+-符号
             int pos;
             for (pos = p + 1; pos < text.length(); pos++) {
                 cj = text.charAt(pos);
-                if (!(cj >= '0' && cj <= '9')) { // not a decimal number
+                if (!(cj >= '0' && cj <= '9')) { //不是十进制数跳出循环
                     break;
                 }
             }
-            if (pos == text.length()) { // parsed to an end
+            if (pos == text.length()) { //解析到最后了
                 return false;
             }
-            if (pos == p + 1) { // '+/-' directly followed by non-integer symbol
+            if (pos == p + 1) { //+/-直接后跟非整数符号
                 return true;
             }
-            if (ParseNumber.isBaseSymbol(cj) || (cj >= 'A' && cj <= 'F') || cj == '.') { // part of another notation
+            if (ParseNumber.isBaseSymbol(cj) || (cj >= 'A' && cj <= 'F') || cj == '.') { //进制表示符、A-F内的数字、小数点返回true
                 return true;
             }
             return false;
@@ -199,8 +201,7 @@ public class Expression {
             return false;
     }
 
-    // 0+NaN*I is never possible during a calculation
-    // and is so used as "No Variable X provided" sign
+    //递归计算解析字符串的值
     public Result value(int l, int r, Complex vX) {
         if (!isWorking) return new Result(2);
 
@@ -208,11 +209,11 @@ public class Expression {
             return new Result(1).setAnswer("表达式语法错误");
         }
 
-        // Check if result cached
+        //检测是否结果已经缓存
         SymbolCachePair pair = interpretResult[l].checkCache(r);
-        if (pair != null) { // cached result
+        if (pair != null) { //开始缓存结果
             Result r1, r2;
-            switch (pair.symbol) { // No fatal error now
+            switch (pair.symbol) { //到目前为止没有错误
                 case SymbolCachePair.SYMBOL_CONST:
                 case SymbolCachePair.SYMBOL_NUM:
                     return new Result(pair.cachedValue);
@@ -239,7 +240,7 @@ public class Expression {
                     return new Result(Complex.div(r1.val, r2.val));
                 case SymbolCachePair.SYMBOL_MUL_OMIT:
                     r1 = value(l, pair.symbol_pos - 1, vX);
-                    r2 = value(pair.symbol_pos, r, vX); // Attention to the pos!
+                    r2 = value(pair.symbol_pos, r, vX); //注意position
                     return new Result(Complex.mul(r1.val, r2.val));
                 case SymbolCachePair.SYMBOL_POW:
                     r1 = value(l, pair.symbol_pos - 1, vX);
@@ -258,29 +259,29 @@ public class Expression {
             }
         }
 
-        // Interpret expression
+        //解析表达式
         String s = text.substring(l, r + 1);
 
-        // Variable
-        if (s.equals("x") && (vX.isValid() || vX.isNaN())) return new Result(vX); // variable X
-        if (s.equals("reg")) return new Result(memValue); // reg value
+        //变量
+        if (s.equals("x") && (vX.isValid() || vX.isNaN())) return new Result(vX); //变量x
+        if (s.equals("reg")) return new Result(memValue); //正则量
 
-        // omit space and enter
+        //忽略空格换行并且解析
         if (text.charAt(l) == ' ' || text.charAt(l) == '\n' || text.charAt(l) == '\r')
             return value(l + 1, r, vX);
         if (text.charAt(r) == ' ' || text.charAt(r) == '\n' || text.charAt(r) == '\r')
             return value(l, r - 1, vX);
 
-        /*======================= Below this line, string will be parsed only once ========================*/
+        /*======================= 此行下方，字符串只会被解析一次 ========================*/
 
-        { // Constants
+        { //常数
             Complex complexConst = null;
-            if (s.equals("e")) complexConst = Complex.E; // constant e
-            else if (s.equals("π")) complexConst = Complex.PI; // constant pi
-            else if (s.equals("i")) complexConst = Complex.I; // constant i
-            else if (s.equals("∞")) complexConst = Complex.Inf; // constant Infinity
-            else if (s.equals("°")) complexConst = new Complex(Math.PI / 180); // degree value
-            else if (s.equals("%")) complexConst = new Complex(0.01); // percent value
+            if (s.equals("e")) complexConst = Complex.E; //常数e
+            else if (s.equals("π")) complexConst = Complex.PI; //常数pi
+            else if (s.equals("i")) complexConst = Complex.I; //常数i
+            else if (s.equals("∞")) complexConst = Complex.Inf; //常数无穷大
+            else if (s.equals("°")) complexConst = new Complex(Math.PI / 180); //度数值
+            else if (s.equals("%")) complexConst = new Complex(0.01); //百分号值
             else {
                 String constValue = Constants.load().get(s);
                 if (constValue != null) {
@@ -294,38 +295,38 @@ public class Expression {
             }
         }
 
-        // Number parsing
+        //解析数据
         try {
-            // Forbid default real values and char e as a operator
-            // Forbid default notations
+            //禁止默认实数值和字符e作为运算符
+            //禁止默认符号
             if (s.indexOf('e') >= 0 || s.indexOf('I') >= 0 || s.indexOf('N') >= 0 ||
                     s.indexOf('X') >= 0 || s.indexOf('P') >= 0 || s.indexOf('x') >= 0 || s.indexOf('p') >= 0) {
                 throw new NumberFormatException();
             }
 
-            try { // try parse decimal double
-                if (s.indexOf('D') >= 0 || s.indexOf('F') >= 0) { // forbid double and float sign
+            try { //try解析十进制double
+                if (s.indexOf('D') >= 0 || s.indexOf('F') >= 0) { //禁止double和float标志
                     throw new NumberFormatException();
                 }
 
                 double v = Double.parseDouble(s);
                 interpretResult[l].submit(r, SymbolCachePair.SYMBOL_NUM, new Complex(v));
                 return new Result(new Complex(v));
-            } catch (NumberFormatException e) { // try parse double under a base
-                // Not a valid dec Double
+            } catch (NumberFormatException e) { //在某进制下解析double
+                //不是合法的十进制double
                 double v = ParseNumber.parse(s);
                 interpretResult[l].submit(r, SymbolCachePair.SYMBOL_NUM, new Complex(v));
                 return new Result(new Complex(v));
             }
         } catch (NumberFormatException e) {
-            // Not a valid Number
+            //不是合法的值
         }
 
         char ci;
-        // Addition and Subtraction
+        //加减
         for (int i = r; i > l; i--) {
             ci = text.charAt(i);
-            // Only ONE of the following long boolean expression will be calculated
+            //仅计算以下长布尔表达式之一
             if (br[i] == br[l] && isAddSubSymbol(i)) {
                 if (ci == '+') {
                     interpretResult[l].submit(r, SymbolCachePair.SYMBOL_ADD, i);
@@ -345,7 +346,7 @@ public class Expression {
             }
         }
 
-        // Unary operator: positive and negative
+        //一元运算，正负
         if (text.charAt(l) == '+') {
             interpretResult[l].submit(r, SymbolCachePair.SYMBOL_POS, -1);
             return value(l + 1, r, vX);
@@ -356,7 +357,7 @@ public class Expression {
             return new Result(Complex.inv(r1.val));
         }
 
-        // Multiplication and Division
+        //乘除
         for (int i = r; i > l; i--) {
             if (br[i] == br[l]) {
                 ci = text.charAt(i);
@@ -387,7 +388,7 @@ public class Expression {
                             return new Result(1).setAnswer("阶乘只能作用于自然数");
                         return fact(r1.val);
                     default:
-                        if (isOmitMult(i)) { // * symbol omission
+                        if (isOmitMult(i)) { //*符号省略了
                             interpretResult[l].submit(r, SymbolCachePair.SYMBOL_MUL_OMIT, i);
                             r1 = value(l, i - 1, vX);
                             if (r1.isFatalError()) return r1;
@@ -399,7 +400,7 @@ public class Expression {
             }
         }
 
-        // Power (priority right->left)
+        //求方标志
         for (int i = l; i <= r; i++)
             if (br[i] == br[l] && text.charAt(i) == '^') {
                 interpretResult[l].submit(r, SymbolCachePair.SYMBOL_POW, i);
@@ -410,7 +411,7 @@ public class Expression {
                 return new Result(Complex.pow(r1.val, r2.val));
             }
 
-        // Sqrt symbol
+        //平方根标志
         if (text.charAt(l) == '√') {
             interpretResult[l].submit(r, SymbolCachePair.SYMBOL_SQRT, -1);
             Result r1 = value(l + 1, r, vX);
@@ -418,7 +419,7 @@ public class Expression {
             return new Result(Complex.sqrt(r1.val));
         }
 
-        // Brackets
+        //检查括号
         if (text.charAt(r) != ')')
             return new Result(1).setAnswer("无法计算 “" + s + "”");
         if (text.charAt(l) == '(') {
@@ -426,7 +427,7 @@ public class Expression {
             return value(l + 1, r - 1, vX);
         }
 
-        // parse function
+        //解析函数
         interpretResult[l].submit(r, SymbolCachePair.SYMBOL_FUNC, -1);
         return funcValue(l, r, vX);
     }
@@ -434,18 +435,18 @@ public class Expression {
     private Result funcValue(int l, int r, Complex vX) {
         String s = text.substring(l, r + 1);
 
-        // Functions
-        int listPos; // the Position in Function class
-        int funcID; // the ID in Function class
-        int paramNum; // how many params in the function
-        int leftBr; // where's the left bracket
-        int exprParamNum; // how many params requires functional input
+        // 以下是基本函数的处理，使用Function枚举
+        int listPos; //Function类里函数表位置
+        int funcID; //序列化的函数ID，Function类里
+        int paramNum; //函数里的参数数量
+        int leftBr; //函数左括号的位置
+        int exprParamNum; //需要函数输入的参数数量
 
         if (funcSer[l] < 0) { // not searched in list yet
             for (int i = 0; i < Function.funcList.length; i++) {
                 if (s.startsWith(Function.funcList[i].funcName + "(")) {
                     //Log.i("expression","parse "+s);
-                    funcSer[l] = i; // found
+                    funcSer[l] = i;
                     break;
                 }
             }
@@ -453,7 +454,7 @@ public class Expression {
 
         listPos = funcSer[l];
 
-        // Not found
+        // 没有找到
         if (listPos < 0)
             return new Result(1).setAnswer("没有函数 “" + s.substring(0, s.length()) + "”");
 
@@ -466,11 +467,11 @@ public class Expression {
             paramNum = commaCnt[leftBr] + 1;
         }
 
-        // Too many param.
+        // 参数太多
         if (paramNum > 9)
             return new Result(1).setAnswer("函数 “" + Function.funcList[listPos].funcName + "” 参数错误");
 
-        // Calculate each param. value
+        // 计算每一个参数.value
         Complex[] val = new Complex[10];
         if (paramNum > 0) {
             for (int p = leftBr, i = 0; nextFS[p] >= 0; p = nextFS[p], i++) {
@@ -487,58 +488,12 @@ public class Expression {
 
         int funcJump = funcID + paramNum;
         switch (funcJump) {
-            case Function.ROOT + 2:
-                return new Result(Complex.pow(val[0], Complex.div(new Complex(1), val[1])));
-            case Function.REMN + 2:
-                if (val[0].im != 0 || val[1].im != 0)
-                    return new Result(3);
-                return new Result(new Complex(val[0].re % val[1].re));
-            case Function.RANDINT:
-                return new Result(new Complex(Math.round(Math.random())));
-            case Function.RANDINT + 1:
-                if (val[0].im != 0)
-                    return new Result(3);
-                return new Result(new Complex(Math.round(Math.random() * val[0].re)));
-            case Function.RANDINT + 2:
-                if (val[0].im != 0 || val[1].im != 0)
-                    return new Result(3);
-                return new Result(new Complex(Math.round(val[0].re + Math.random() * (val[1].re - val[0].re))));
-            case Function.SIGN + 1:
-                if (val[0].im != 0)
-                    return new Result(3);
-                return new Result(new Complex(Math.signum(val[0].re)));
-            case Function.LCM + 2:
-                if (val[0].re % 1 != 0 || val[1].re % 1 != 0 || val[0].re <= 0 || val[1].re <= 0)
-                    return new Result(1).setAnswer("参数必须是正整数");
-                return lcm(val[0], val[1]);
-            case Function.GCD + 2:
-                if (val[0].re % 1 != 0 || val[1].re % 1 != 0 || val[0].re <= 0 || val[1].re <= 0)
-                    return new Result(1).setAnswer("参数必须是正整数");
-                return gcd(val[0], val[1]);
-            case Function.ISPRIME + 1:
-                if (val[0].re % 1 != 0 || val[0].re <= 0)
-                    return new Result(1).setAnswer("参数必须是正整数");
-                return new Result(isPrime(val[0]));
-            case Function.PRIME + 1:
-                if (val[0].re % 1 != 0 || val[0].re <= 0)
-                    return new Result(1).setAnswer("寻找质数的参数必须是正整数");
-                return prime(val[0]);
             case Function.FACT + 1:
                 if (val[0].re % 1 != 0 || val[0].re < 0)
                     return new Result(1).setAnswer("阶乘函数的参数必须是自然数");
                 return fact(val[0]);
-            case Function.MAX + 2:
-                return new Result(Complex.max(val[0], val[1]));
-            case Function.MIN + 2:
-                return new Result(Complex.min(val[0], val[1]));
-            case Function.LG + 1:
-                return new Result(Complex.log(val[0]));
-            case Function.LOG + 2:
-                return new Result(Complex.logab(val[0], val[1]));
             case Function.CBRT + 1:
                 return new Result(Complex.cbrt(val[0]));
-
-
             case Function.EXP + 1:
                 return new Result(Complex.exp(val[0]));
             case Function.LN + 1:
@@ -551,10 +506,6 @@ public class Expression {
                 return new Result(Complex.sqrt(val[0]));
             case Function.ABS + 1:
                 return new Result(val[0].abs());
-            case Function.NORM + 1:
-                return new Result(val[0].norm());
-            case Function.ARG + 1:
-                return new Result(val[0].arg());
             case Function.SIN + 1:
                 return new Result(Complex.sin(val[0]));
             case Function.COS + 1:
@@ -567,55 +518,11 @@ public class Expression {
                 return new Result(Complex.arccos(val[0]));
             case Function.ATAN + 1:
                 return new Result(Complex.arctan(val[0]));
-            case Function.GAMMA + 1:
-                return new Result(Complex.gamma(val[0]));
-            case Function.FLOOR + 1:
-                return new Result(new Complex(Math.floor(val[0].re), Math.floor(val[0].im)));
-            case Function.CEIL + 1:
-                return new Result(new Complex(Math.ceil(val[0].re), Math.ceil(val[0].im)));
             case Function.REG:
                 return new Result(memValue);
             case Function.REG + 1:
                 memValue = val[0];
                 return new Result(val[0]);
-            case Function.CONJ + 1:
-                return new Result(new Complex(val[0].re, -val[0].im));
-            case Function.RAND:
-                return new Result(new Complex(Math.random(), Math.random()));
-            case Function.RAND + 1:
-                return new Result(new Complex(val[0].re * Math.random(), val[0].im * Math.random()));
-            case Function.ROUND + 1:
-                return new Result(new Complex(Math.round(val[0].re), Math.round(val[0].im)));
-            case Function.ROUND + 2:
-                double precRnd = Math.round(val[1].re);
-                if (precRnd < 0)
-                    return new Result(1).setAnswer("设置的精度过低");
-                if (precRnd > 15)
-                    return new Result(1).setAnswer("设置的精度过高");
-                double ratio = Math.pow(10, precRnd);
-                return new Result(new Complex(Math.round(val[0].re * ratio) / ratio, Math.round(val[0].im * ratio) / ratio));
-            case Function.DIFF + 2:
-                return diff(leftBr + 1, nextFS[leftBr] - 1, val[1]);
-            case Function.DIFF + 3:
-                return diff(leftBr + 1, nextFS[leftBr] - 1, val[1], val[2]);
-            case Function.LIMIT + 2:
-                return limit(leftBr + 1, nextFS[leftBr] - 1, val[1]);
-            case Function.LIMIT + 3:
-                return limit(leftBr + 1, nextFS[leftBr] - 1, val[1], val[2]);
-            case Function.EVAL + 2:
-                return value(leftBr + 1, nextFS[leftBr] - 1, val[1]);
-            case Function.FZERO + 1:
-                return solve(leftBr + 1, nextFS[leftBr] - 1, new Complex(-1 + Math.random() * 2, -1 + Math.random() * 2));
-            case Function.FZERO + 2:
-                return solve(leftBr + 1, nextFS[leftBr] - 1, val[1]);
-            case Function.INTEG + 3:
-                return integrate(leftBr + 1, nextFS[leftBr] - 1, val[1], val[2]);
-            case Function.SUM + 3:
-                return sum(leftBr + 1, nextFS[leftBr] - 1, val[1], val[2]);
-            case Function.PERM + 2:
-                return new Result(perm(val[0], val[1]));
-            case Function.COMB + 2:
-                return new Result(comb(val[0], val[1]));
             case Function.PREC:
                 Result.setBase(Result.base);
                 return new Result(0).setAnswer("精度设置为 " + Result.precision + " 位小数");
@@ -645,696 +552,18 @@ public class Expression {
         return new Result(1).setAnswer("函数 “" + Function.funcList[listPos].funcName + "” 参数错误");
     }
 
-    public Result value() { // Entrance !
+    //入口
+    public Result value() {
         isWorking = true;
-        isIntegOverTolerance = false;
-        isDiffOverTolerance = false;
+
         if (brDiff != 0) {
             return new Result(1).setAnswer("括号不匹配");
         }
 
-        // Start working
-        // 0+NaNi id a sign for "No Variable X provided" initially
+        // 开始计算
         initCache();
         Result res = value(0, text.length() - 1, new Complex(0, Double.NaN));
         return res;
-    }
-
-    // 3 point diff()
-    Result diff3(int l, int r, Complex x0, Complex delta) {
-        Result rn = value(l, r, Complex.sub(x0, delta));
-        if (rn.isFatalError()) return rn;
-        if (!rn.val.isValid()) return new Result(-1);
-        Result rp = value(l, r, Complex.add(x0, delta));
-        if (rp.isFatalError()) return rp;
-
-        Complex dv = Complex.div(Complex.sub(rp.val, rn.val), new Complex(delta.re * 2, delta.im * 2));
-        return new Result(dv);
-    }
-
-    // 5 point diff()
-    Result diff5(int l, int r, Complex x0, Complex delta) {
-        Result r1 = diff3(l, r, x0, delta);
-        if (r1.isFatalError()) return r1;
-        if (!r1.val.isValid()) return new Result(-1);
-        Result r2 = diff3(l, r, x0, new Complex(delta.re * 2, delta.im * 2));
-        if (r2.isFatalError()) return r2;
-
-        Complex dv = Complex.div(new Complex(r1.val.re * 4 - r2.val.re, r1.val.im * 4 - r2.val.im), new Complex(3));
-        return new Result(dv);
-    }
-
-    // general diff()
-    private boolean isDiffOverTolerance = false; // only checked for once, reduce data traffic
-
-    Result diff(int l, int r, Complex x0) {
-
-        final int sect = 8;
-        final double sectAngle = Math.PI / sect;
-        final double TOL = 1E-5;
-        Complex[] dirDer = new Complex[sect];
-        Complex dsum = new Complex(0);
-        double dvar = 0;
-        for (int i = 0; i < sect; i++) { // find directions in [0,pi)
-            Complex delta = new Complex(Math.cos(i * sectAngle) * TOL, Math.sin(i * sectAngle) * TOL);
-            Result rv = diff5(l, r, x0, delta);
-            if (rv.isFatalError()) return rv;
-            dirDer[i] = rv.val;
-            dsum = Complex.add(dsum, rv.val);
-        }
-        dsum.re /= sect;
-        dsum.im /= sect;
-        for (int i = 0; i < sect; i++) {
-            dvar += Complex.sub(dirDer[i], dsum).norm2();
-        }
-        Result res = new Result(dsum);
-        if (!isDiffOverTolerance && dvar > TOL) {
-            isDiffOverTolerance = true;
-            res.append("某些情况下函数失效");
-        }
-        return res;
-    }
-
-    // directional diff
-    Result diff(int l, int r, Complex x0, Complex dir) {
-        if (dir.re == 0 && dir.im == 0 || !dir.isFinite())
-            return new Result(1).setAnswer("无效的方向值");
-
-        final double TOL = 1E-5;
-
-        double norm = dir.norm().re;
-        Complex delta = new Complex(dir.re / norm * TOL, dir.im / norm * TOL);
-        Result rv = diff5(l, r, x0, delta);
-        if (rv.isFatalError()) return rv;
-        return new Result(rv.val);
-    }
-
-    // solve under condition
-    Result solve(int l, int r, Complex x0, Complex M, int iter) {
-        // Improved Secant Method, avoid second derivative
-        Complex x1 = x0;
-        Result res1 = value(l, r, x1);
-        if (res1.isFatalError()) return res1;
-        Complex v1 = res1.val;
-        Complex r1 = Complex.div(v1, diff(l, r, x1).val);
-        if (r1.isNaN()) {
-            return new Result(1).setAnswer("无效的初始值");
-        }
-        // 1 step Newton Method Iteration
-        Complex x2 = Complex.sub(x1, r1);
-        Complex v2 = value(l, r, x2).val;
-        if (r1.norm2() < 1E-20 && v2.norm2() < 1E-20) { // 1E-10 precision
-            return new Result(x2);
-        }
-
-        Complex r2 = Complex.div(v2, diff(l, r, x2, r1).val); // use dir diff to speed up
-        if (r2.isNaN()) {
-            return new Result(1).setAnswer("无效的初始值");
-        }
-
-        Complex x3;
-        Result root = new Result(0);
-        List<Complex> histRes = new ArrayList<>();
-        double minDe = 1E200;
-        int minPos = -1;
-        int overErrorRangeCount = 0;
-
-        for (int i = 0; i <= iter; i++) { // normally no more than 20 iter., but for eq. such as x^.2, more is needed.
-
-            if (!isWorking) return new Result(2);
-
-            Complex d1 = Complex.mul(Complex.sub(x2, x1), r2);
-            Complex d2 = Complex.sub(r2, r1);
-
-
-            x3 = Complex.mul(Complex.sub(x2, Complex.div(d1, d2)), M); // Relaxation Param.
-
-            Complex deltaX = Complex.sub(x2, x3);
-            double deltaE = deltaX.norm2();
-
-            histRes.add(x3);
-            if (i > 0) {
-
-                if (deltaE < minDe) {
-                    minDe = deltaE;
-                    minPos = i;
-                    overErrorRangeCount = 0;
-                } else {
-                    overErrorRangeCount++;
-                }
-
-                if (!x3.isFinite() || overErrorRangeCount > 20) {
-                    // return the result
-                    Complex res = histRes.get(minPos);
-                    if (minDe > 1E-20 || v2.norm2() > 1E-18) {
-                        root.append("某些情况下函数失效");
-                    } else {
-                        root = new Result(res);
-                    }
-                    break;
-                }
-
-            }
-
-            v2 = value(l, r, x3).val;
-            x1 = x2;
-            x2 = x3;
-            r1 = r2;
-            r2 = Complex.div(v2, diff(l, r, x3).val); // use dir diff to speed up
-            if (r2.isNaN()) { // Math Error
-                if (M.re == 1.0) { // 1.0 is a safely expressed double
-                    root = new Result(1).setAnswer("无效的迭代器，某些情况下函数失效");
-                }
-                break;
-            }
-        }
-
-        return root;
-    }
-
-    // general solve
-    Result solve(int l, int r, Complex x0) { // auto solver
-        Result rp;
-        for (double M = 1.0; M > 0.05; M *= 0.7) {
-            if (!isWorking) return new Result(2);
-
-            rp = solve(l, r, x0, new Complex(M), (int) Math.round(1500 / Math.sqrt(M)));
-            if (rp.isFatalError()) return rp;
-            if (rp.val.isValid() && !rp.val.isNaN()) {
-                return rp;
-            }
-            if (rp.getError() == -1) { // Initial Value Error
-                break;
-            }
-            if (M == 1.0) {
-                rp.append("尝试 Under-Relaxation 方法");
-            }
-        }
-
-        return new Result(1).setAnswer("寻找函数零点 " + text.substring(l, r + 1) + " 失败");
-    }
-
-    // 15 nodes Gauss Quadrature
-    private static final double[] gaussNodes15 = new double[]{ // G15 Nodes
-            0.000000000000000000000000000000000e+00,
-            2.011940939974345223006283033945962e-01,
-            3.941513470775633698972073709810455e-01,
-            5.709721726085388475372267372539106e-01,
-            7.244177313601700474161860546139380e-01,
-            8.482065834104272162006483207742169e-01,
-            9.372733924007059043077589477102095e-01,
-            9.879925180204854284895657185866126e-01
-    };
-
-    private static final double[] gaussWeights15 = new double[]{
-            2.025782419255612728806201999675193e-01,
-            1.984314853271115764561183264438393e-01,
-            1.861610000155622110268005618664228e-01,
-            1.662692058169939335532008604812088e-01,
-            1.395706779261543144478047945110283e-01,
-            1.071592204671719350118695466858693e-01,
-            7.036604748810812470926741645066734e-02,
-            3.075324199611726835462839357720442e-02
-    };
-
-    Complex gaussIntegrate15(int l, int r, Complex x0, Complex x2) { // G15
-        Complex lenH = new Complex(x2.re - x0.re, x2.im - x0.im);
-        Complex halfH = new Complex(lenH.re / 2, lenH.im / 2);
-
-        Complex t0 = new Complex((x0.re + x2.re) / 2, (x0.im + x2.im) / 2);
-        Complex[] tp = new Complex[7];
-        Complex[] tn = new Complex[7];
-
-        for (int i = 0; i < 7; i++) {
-            tp[i] = new Complex(t0.re + gaussNodes15[i + 1] * halfH.re, t0.im + gaussNodes15[i + 1] * halfH.im);
-            tn[i] = new Complex(t0.re - gaussNodes15[i + 1] * halfH.re, t0.im - gaussNodes15[i + 1] * halfH.im);
-        }
-
-        t0 = value(l, r, t0).val;
-        Complex sum = new Complex(t0.re * gaussWeights15[0], t0.im * gaussWeights15[0]);
-        for (int i = 0; i < 7; i++) {
-            tp[i] = value(l, r, tp[i]).val;
-            tn[i] = value(l, r, tn[i]).val;
-            sum = Complex.add(sum, new Complex(
-                    (tp[i].re + tn[i].re) * gaussWeights15[i + 1],
-                    (tp[i].im + tn[i].im) * gaussWeights15[i + 1]
-            ));
-        }
-
-        sum = Complex.mul(sum, halfH);
-
-        return sum;
-    }
-
-    // integrate from x0 to x2, auto step-length
-    private boolean isIntegOverTolerance = false; // only checked for once, reduce data traffic
-    private static final double infIntegrateStepRatio = Math.E * Math.E;
-
-    Result adaptiveIntegrate(int l, int r, Complex x0, Complex x2, Complex lastSum, double TOL, int depth) {
-
-        if (!isWorking) return new Result(2);
-
-        Complex x1;
-
-        if (Double.isInfinite(x0.re)) {
-            return new Result(1).setVal(new Complex(0));
-        }
-
-        if (Double.isInfinite(x2.re)) {
-            double aRe = Math.abs(x0.re);
-            double newRe;
-            if (aRe <= 1E5) { // Avoid precision loss due to large number
-                double logNextPoint = aRe * 2;
-                newRe = (logNextPoint < 1 ? Math.exp(logNextPoint) : infIntegrateStepRatio * aRe);
-            } else
-                return new Result(-1).setVal(new Complex(0));
-
-            //System.out.println("New Point: "+x0.toString()+" ~ "+x2.toString());
-            if (x2.re > 0) { // POS Inf
-                x1 = new Complex(newRe, x0.im);
-            } else { // NEG Inf
-                x1 = new Complex(-newRe, x0.im);
-            }
-        } else {
-            x1 = new Complex((x0.re + x2.re) / 2, (x0.im + x2.im) / 2);
-        }
-
-        Complex sAB, sAC, sCB, sABnew, abbr;
-
-        sAB = lastSum;
-        sAC = gaussIntegrate15(l, r, x0, x1);
-        sCB = gaussIntegrate15(l, r, x1, x2);
-        sABnew = new Complex(0);
-        if (sAC.isFinite()) sABnew = Complex.add(sABnew, sAC);
-        if (sCB.isFinite()) sABnew = Complex.add(sABnew, sCB);
-        abbr = Complex.sub(sAB, sABnew);
-
-        if (abbr.isValid() && abbr.norm2() < 200 * TOL) { // Under precision limit
-            return new Result(sABnew);
-        }
-
-        if (depth >= 20) { // Max iteration
-            Result r1 = new Result(sABnew);
-            if (!isIntegOverTolerance && abbr.norm().re > 1E3 * TOL) {
-                isIntegOverTolerance = true;
-                r1.append("某些情况下函数失效");
-            }
-
-            return r1;
-        }
-
-        sAC = adaptiveIntegrate(l, r, x0, x1, sAC, TOL / 4, depth + 1).val;
-        sCB = adaptiveIntegrate(l, r, x1, x2, sCB, TOL / 4, depth + 1).val;
-        sABnew = Complex.add(sAC, sCB);
-
-        return new Result(sABnew);
-    }
-
-    // general quadrature
-    Result integrate(int l, int r, Complex x0, Complex x2) {
-        if (x0.isNaN()) {
-            return new Result(1).setAnswer("无效的下界");
-        }
-        if (x2.isNaN()) {
-            return new Result(1).setAnswer("无效的上界");
-        }
-        Result check = value(l, r, x0); // Check for syntax error. Better solution ?
-        if (check.isFatalError()) return check;
-
-        if (Double.isInfinite(x0.re)) {
-            if (Double.isInfinite(x2.re)) { // Add middle point
-                double iim = ((Complex.isDoubleFinite(x0.im) ? x0.im : 0) + (Complex.isDoubleFinite(x2.im) ? x2.im : 0)) / 2;
-
-                Result r1 = integrate(l, r, x0, new Complex(0, iim));
-                Result r2 = integrate(l, r, new Complex(0, iim), x2);
-                return new Result(Complex.add(r1.val, r2.val));
-            } else {
-                Result r1 = integrate(l, r, x2, x0);
-                return new Result(new Complex(-r1.val.re, -r1.val.im));
-            }
-        }
-
-        double TOL = 1E-8; // the precision expected, 8 digits
-
-        Complex sAB = gaussIntegrate15(l, r, x0, x2);
-        return adaptiveIntegrate(l, r, x0, x2, sAB, TOL * TOL, 0);
-    }
-
-    // summation
-    Result sum(int l, int r, Complex start, Complex end) {
-        double ds = start.re;
-        double de = end.re;
-        boolean isInfiniteSummation = (Double.isInfinite(ds) || Double.isInfinite(de));
-
-        if (de < ds) {
-            return new Result(1).setAnswer("上界小于下界");
-        }
-
-        Complex sum = new Complex(0);
-        Complex v = new Complex(0);
-        final double TOL2 = 1E-16; // 8 digits expected
-        final int maxBoundCnt = 1000;
-        int boundCnt = 0;
-        int cnt = 0;
-
-        double ratio = (end.im - start.im) / (de - ds);
-        if (!Complex.isDoubleFinite(ratio)) {
-            return new Result(1).setAnswer("无法运算求和的路径");
-        }
-        for (v.re = ds; v.re <= de; v.re += 1, cnt++) {
-            if (!isWorking) return new Result(2);
-
-            v.im = (v.re - ds) * ratio + start.im;
-            Result res = value(l, r, v);
-            if (res.isFatalError()) {
-                return res;
-            }
-            if (!res.val.isFinite()) {
-                return new Result(sum).append("求和时发现错误 x=" + v.toString() + " ，求和可能不是有限的");
-            }
-
-            if (isInfiniteSummation) {
-                if (res.val.norm2() < TOL2) {
-                    boundCnt++;
-                } else {
-                    boundCnt = 0;
-                }
-                if (boundCnt > maxBoundCnt) {
-                    break;
-                }
-            }
-
-            sum = Complex.add(sum, res.val);
-        }
-
-        return new Result(sum);
-    }
-
-    // permutation & combination
-    private Complex permIter(Complex n_, Complex m_) { // Gamma(n+1)/Gamma(m+1)
-        Complex n, m;
-        Complex ans = new Complex(1);
-        n = n_;
-        m = m_;
-
-        while (true) { // adapted from iteration
-            if (n.re > 1 && m.re > 1) {
-                if (n.re - m.re >= 1) {
-                    ans = Complex.mul(new Complex(n.re), ans);
-                    n.re -= 1;
-                } else if (m.re - n.re >= 1) {
-                    ans = Complex.div(ans, new Complex(m.re));
-                    m.re -= 1;
-                } else {
-                    ans = Complex.mul(new Complex(n.re / m.re), ans);
-                    n.re -= 1;
-                    m.re -= 1;
-                }
-            } else if (n.re == m.re && n.im == m.im) {
-                break;
-            } else {
-                Complex af = Complex.div(Complex.gamma(new Complex(n.re + 1, n.im)), Complex.gamma(new Complex(m.re + 1, m.im)));
-                ans = Complex.mul(af, ans);
-                break;
-            }
-            if (!ans.isFinite()) { // invalid value occurred, no need to continue
-                break;
-            }
-            if (!isWorking) return new Complex().error(2);
-        }
-
-        return ans;
-    }
-
-    public Complex perm(Complex n, Complex r) {
-        return permIter(n, Complex.sub(n, r));
-    }
-
-    private Complex combIter(Complex n_, Complex m_) { // Gamma(n+1)/Gamma(m+1)/Gamma(n-m+1)
-
-        Complex n, m;
-        Complex ans = new Complex(1);
-        n = n_;
-        m = m_;
-
-        while (true) { // adapted from iteration
-            if (n.re > 1 && m.re > 1) {
-                ans = Complex.mul(new Complex(n.re / m.re), ans);
-                n.re -= 1;
-                m.re -= 1;
-            } else {
-                Complex af = Complex.div(perm(n, m), Complex.gamma(new Complex(m.re + 1, m.im)));
-                ans = Complex.mul(af, ans);
-                break;
-            }
-            if (!ans.isFinite()) { // invalid value occurred, no need to continue
-                break;
-            }
-            if (!isWorking) return new Complex().error(2);
-        }
-
-        return ans;
-    }
-
-    public Complex comb(Complex n, Complex r) {
-        return combIter(n, r);
-    }
-
-    // limit (Lagrange interpolation)
-    private static final Complex par2p = new Complex((1 + Math.sqrt(2)) / 4);
-    private static final Complex par2n = new Complex((1 - Math.sqrt(2)) / 4);
-    private static final Complex hRatio = new Complex(1 + Math.sqrt(2));
-
-    private Result limitH(int l, int r, Complex x0, Complex h) {
-
-        Complex f0;
-        boolean finiteLimit = x0.isFinite();
-
-        Complex x1, x2, x3, x4;
-
-        if (finiteLimit) {
-            x1 = Complex.add(x0, h);
-            x2 = Complex.add(x0, Complex.mul(h, hRatio));
-            x3 = Complex.sub(x0, h);
-            x4 = Complex.sub(x0, Complex.mul(h, hRatio));
-        } else {
-            double norm2 = h.norm2();
-            x1 = new Complex(h.re / norm2, h.im / norm2);
-            x2 = new Complex(x1.re * 2, x1.im * 2);
-            x3 = new Complex(x1.re * 3, x1.im * 3);
-            x4 = new Complex(x1.re * 4, x1.im * 4);
-        }
-
-        Result r1 = value(l, r, x1);
-        if (r1.isFatalError()) return r1;
-        Result r2 = value(l, r, x2);
-        if (r2.isFatalError()) return r2;
-        Result r3 = value(l, r, x3);
-        if (r3.isFatalError()) return r3;
-        Result r4 = value(l, r, x4);
-        if (r4.isFatalError()) return r4;
-
-        Complex f1 = r1.val;
-        Complex f2 = r2.val;
-        Complex f3 = r3.val;
-        Complex f4 = r4.val;
-
-        if (finiteLimit) {
-            Complex f13 = Complex.mul(Complex.add(f1, f3), par2p);
-            Complex f24 = Complex.mul(Complex.add(f2, f4), par2n);
-            f0 = Complex.add(f13, f24);
-        } else {
-            f0 = new Complex(
-                    (-f1.re + 24 * f2.re - 81 * f3.re + 64 * f4.re) / 6,
-                    (-f1.im + 24 * f2.im - 81 * f3.im + 64 * f4.im) / 6
-            );
-        }
-
-        return new Result(f0);
-    }
-
-    // general limit
-    public Result limit(int l, int r, Complex x0) {
-
-        // Responsibility recharge
-        if (Double.isInfinite(x0.re)) { // to real infinity
-            return limit(l, r, x0, new Complex(x0.re > 0 ? 1 : -1));
-        }
-        if (Double.isInfinite(x0.im)) { // to imaginary infinity
-            return limit(l, r, x0, new Complex(0, x0.im > 0 ? 1 : -1));
-        }
-
-        final int sect = 8;
-        final double sectAngle = Math.PI / sect;
-        Complex[] limitRes = new Complex[sect];
-        Complex limitSum = new Complex(0);
-        double limitVar = 0;
-        int validSect = 0;
-
-        for (int i = 0; i < sect; i++) { // find directions in [0,pi)
-
-            List<Complex> histRes = new ArrayList<>();
-            double minDe = 1E200;
-            int minPos = -1;
-
-            int cnt = 0;
-            int overErrorRangeCount = 0;
-            double h;
-            for (h = 1E-1; h >= 1E-10; h *= 0.9, cnt++) {
-                Complex delta = new Complex(Math.cos(i * sectAngle) * h, Math.sin(i * sectAngle) * h);
-                Result resR = limitH(l, r, x0, delta);
-                if (resR.isFatalError()) return new Result(1).setAnswer("未找到极限");
-                Complex res = resR.val;
-
-                if (cnt > 0) {
-                    double e = Complex.sub(res, histRes.get(cnt - 1)).norm().re;
-
-                    if (e < minDe) {
-                        overErrorRangeCount = 0;
-                        minDe = e;
-                        minPos = cnt;
-                    } else { // e >= minDe or e is NaN!
-                        overErrorRangeCount++;
-                    }
-                    if (overErrorRangeCount > 20) {
-                        break;
-                    }
-                }
-
-                histRes.add(res);
-            }
-
-            if (minDe > 1E-5) { // didn't found ?
-                new Result(-1).setAnswer("函数可能没有收敛");
-            } else { // found
-                Complex minRes = histRes.get(minPos - 1);
-                limitSum = Complex.add(limitSum, minRes);
-                limitRes[validSect] = minRes;
-                validSect++;
-            }
-        }
-
-        if (validSect == 0) return new Result(1).setAnswer("未找到极限");
-
-        limitSum.re /= validSect;
-        limitSum.im /= validSect;
-        for (int i = 0; i < validSect; i++) {
-            limitVar += Complex.sub(limitRes[i], limitSum).norm2();
-        }
-
-        Result res = new Result(limitSum);
-        if (limitVar > 1E-5) {
-            res.append("函数可能没有收敛到预期精度");
-        }
-
-        return res;
-    }
-
-    // directional limit
-    public Result limit(int l, int r, Complex x0, Complex dir) {
-        if (dir.re == 0 && dir.im == 0 || !dir.isFinite())
-            return new Result(1).setAnswer("无效的方向值");
-
-
-        List<Complex> histRes = new ArrayList<>();
-        double minDe = 1E200;
-        int minPos = -1;
-        double norm = dir.norm().re;
-
-        int cnt = 0;
-        int overErrorRangeCount = 0;
-        double h;
-        for (h = 1E-1; h >= 1E-10; h *= 0.9, cnt++) {
-            Complex delta = new Complex(dir.re / norm * h, dir.im / norm * h);
-            Result resR = limitH(l, r, x0, delta);
-            if (resR.isFatalError()) return new Result(1).setAnswer("未找到极限");
-            Complex res = resR.val;
-
-            if (cnt > 0) {
-                double e = Complex.sub(res, histRes.get(cnt - 1)).norm().re;
-
-                if (e < minDe) {
-                    overErrorRangeCount = 0;
-                    minDe = e;
-                    minPos = cnt;
-                } else { // e >= minDe or e is NaN!
-                    overErrorRangeCount++;
-                }
-                if (overErrorRangeCount > 20) {
-                    break;
-                }
-
-            }
-            histRes.add(res);
-        }
-
-        if (minPos < 1) {
-            return new Result(1).setAnswer("函数在给定点上可能没有收敛");
-        }
-        Complex minRes = histRes.get(minPos - 1);
-
-        if (minDe > 1E-5) { // didn't found ?
-            return new Result(1).setAnswer("函数在给定点上可能没有收敛");
-        } else { // found
-            return new Result(minRes);
-        }
-    }
-
-    private Result gcd(Complex c, Complex c2) {
-        if (c.im != 0 || c2.im != 0)
-            return new Result(3);
-        double x = c.re, y = c2.re;
-        while (x != y) {
-            if (!isWorking) return new Result(2);
-            if (x > y) x = x - y;
-            else y = y - x;
-        }
-        return new Result(new Complex(x));
-    }
-
-    private Result lcm(Complex c, Complex c2) {
-        if (c.im != 0 || c2.im != 0)
-            return new Result(3);
-        double x = c.re, y = c2.re;
-        Result gcd = gcd(c, c2);
-        if (gcd.getError() == 2)
-            return gcd;
-        else
-            return new Result(new Complex((x * y / gcd.val.re)));
-    }
-
-    private Complex isPrime(Complex c) {
-        if (c.im != 0)
-            return new Complex().error(3);
-        double x = c.re;
-        if (x == 1) return new Complex(false);
-
-        for (int i = 2; i <= Math.sqrt(x); i++) {
-            if (x % i == 0)
-                return new Complex(false);
-        }
-        return new Complex(true);
-    }
-
-    private Result prime(Complex c) {
-        if (c.im != 0)
-            return new Result(3);
-        double i = 2, j = 1, n = c.re;
-        while (true) {
-            if (!isWorking) return new Result(2);
-            j = j + 1;
-            if (j > i / j) {
-                n--;
-                if (n == 0)
-                    break;
-                j = 1;
-            }
-            if (i % j == 0) {
-                i++;
-                j = 1;
-            }
-        }
-        return new Result(new Complex(i));
     }
 
     private void carry(int[] bit, int pos) {

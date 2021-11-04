@@ -46,9 +46,9 @@ public class MainActivity extends BaseActivity {
     private EditText inText;
     private TextView stateText;
     private TextView outText;
-    private ViewPager drawerPager;
-    private DrawerLayout drawer;
-    private ArrayList<View> drawerPageList;
+//    private ViewPager drawerPager;
+//    private DrawerLayout drawer;
+//    private ArrayList<View> drawerPageList;
     public FrameLayout delete;
 
 
@@ -78,14 +78,14 @@ public class MainActivity extends BaseActivity {
                     },
             {"上次运算",  "圆周率", "自然底数"}};*/
     //正则表达式
-    private static final Pattern FUNCTIONS_KEYWORDS = Pattern.compile(
-            "\\b(" + "sqrt|cbrt|abs|lg|ln|exp|fact|" +
-                    "sin|cos|tan|asin|acos|atan|Γ" + ")\\b");
-
-    private static final Pattern CONSTANS_KEYWORDS2 = Pattern.compile(
-            "\\b(" + "ans|reg|true|false|me|mn|mp" + ")\\b");
-
-    private static final Pattern CONSTANS_KEYWORDS1 = Pattern.compile("[∞°%πe]");
+//    private static final Pattern FUNCTIONS_KEYWORDS = Pattern.compile(
+//            "\\b(" + "sqrt|cbrt|abs|lg|ln|exp|fact|" +
+//                    "sin|cos|tan|asin|acos|atan|Γ" + ")\\b");
+//
+//    private static final Pattern CONSTANS_KEYWORDS2 = Pattern.compile(
+//            "\\b(" + "ans|reg|true|false|me|mn|mp" + ")\\b");
+//
+//    private static final Pattern CONSTANS_KEYWORDS1 = Pattern.compile("[∞°%πe]");
 
     //private static final String[] FUNCTION_LIST = {"科学计算", "大数计算", "进制转换", "大写数字"};
 
@@ -438,8 +438,6 @@ public class MainActivity extends BaseActivity {
 
     }
 
-    private boolean modified = true;
-    private int selection = 0;
     private Thread calcThread;//一个统一的计算线程变量，用该变量重复引用每次计算创建的线程对象
     private String rootValue;
 
@@ -472,9 +470,10 @@ public class MainActivity extends BaseActivity {
                 }
             }
 
+            //原本做的是匹配到函数就把光标移到括号中，后面移到科学计算器里了，也是一样的功能
             @Override
             public void afterTextChanged(Editable s) {
-                if (!modified) return;//没有修改就返回
+/*                if (!modified) return;//没有修改就返回
 
                 //获取光标位置
                 selection = inText.getSelectionStart();
@@ -497,7 +496,7 @@ public class MainActivity extends BaseActivity {
 
                 if (selection >= 2 && s.toString().substring(selection - 2, selection).equals("()"))
                     selection--;
-                inText.setSelection(selection);
+                inText.setSelection(selection);*/
             }
         });
     }
@@ -510,42 +509,6 @@ public class MainActivity extends BaseActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
     }
-
-    //TODO:什么G8上帝模式
-    private void setGodMode(boolean isGodMode) {
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        ActionBar actionBar = getSupportActionBar();
-        godMenuItem.setChecked(isGodMode);
-        if (isGodMode) {
-            actionBar.setDisplayHomeAsUpEnabled(false);
-            drawer.setVisibility(View.GONE);
-            Class<EditText> cls = EditText.class;
-            Method method;
-            try {
-                method = cls.getMethod("setShowSoftInputOnFocus", boolean.class);
-                method.setAccessible(true);
-                method.invoke(inText, true);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            imm.showSoftInput(inText, InputMethodManager.SHOW_FORCED);
-        } else {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            drawer.setVisibility(View.VISIBLE);
-            Class<EditText> cls = EditText.class;
-            Method method;
-            try {
-                method = cls.getMethod("setShowSoftInputOnFocus", boolean.class);
-                method.setAccessible(true);
-                method.invoke(inText, false);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            imm.hideSoftInputFromWindow(inText.getWindowToken(), 0);
-        }
-    }
-
-    private MenuItem godMenuItem;
 
     //创建菜单选项
     @Override

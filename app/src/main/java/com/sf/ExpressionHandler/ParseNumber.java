@@ -4,7 +4,7 @@ public class ParseNumber {
 
     private static final String baseSymbol = "  ⑵⑶⑷⑸⑹⑺⑻⑼⑽⑾⑿⒀⒁⒂⒃";
 
-    // is this character a base notation?这个字符是基本符号吗？
+    //判断字符是否baseSymbol里的，特定的进制下的
     public static boolean isBaseSymbol(char c) {
         return baseSymbol.indexOf(c) != -1;
     }
@@ -57,7 +57,7 @@ public class ParseNumber {
 
         //将~号右边数字解析
         int base = Integer.parseInt(s.substring(baseDivSymbolPos + 1));
-        if (!(base >= 2 && base <= 10 || base == 12 || base == 16)) // base not supported有些进制不支持
+        if (!(base >= 2 && base <= 10 || base == 12 || base == 16)) //有些进制不支持
             throw new NumberFormatException();
 
         return parseRaw(s.substring(0, baseDivSymbolPos), base);
@@ -77,7 +77,7 @@ public class ParseNumber {
         if (baseSymbolPos == 0) throw new NumberFormatException();
         if (baseSymbolPos < 0) return parseCompat(s); //将字符串解析为适配格式
 
-        //TODO:有进制符就找下一位指数，计算100(2)1?
+        //TODO:有进制符就找下一位指数，如计算100(2)1
         int exp;//存放指数
         if (baseSymbolPos == s.length() - 1) {
             exp = 0;//没有指数

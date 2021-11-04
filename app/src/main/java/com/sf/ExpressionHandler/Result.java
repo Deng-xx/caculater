@@ -23,12 +23,6 @@ public class Result {
     //设置反馈信息
     public Result setAnswer(String answer) {
         val.setAnswer(answer);
-        //append(answer);
-        return this;
-    }
-
-    public Result append(String name) {
-        //Temporarily not used
         return this;
     }
 
@@ -38,7 +32,6 @@ public class Result {
         return this;
     }
 
-    //
     public static void setBase(int base_) {
         base = base_;
         precision = (int) Math.floor(35 * Math.log(2) / Math.log(base_));//logbase(2)
