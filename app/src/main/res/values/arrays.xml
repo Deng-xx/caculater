@@ -41,6 +41,40 @@
         <item>二十五年</item>
         <item>三十年</item>
     </string-array>
+    <string-array name="length">
+        <item>纳米</item>
+        <item>微米</item>
+        <item>毫米</item>
+        <item>厘米</item>
+        <item>分米</item>
+        <item>米</item>
+        <item>公里/千米</item>
+        <item>英里</item>
+        <item>英寸</item>
+        <item>丈</item>
+        <item>尺</item>
+        <item>海里</item>
+        <item>码</item>
+    </string-array>
+    <string-array name="area">
+        <item>平方厘米</item>
+        <item>平方毫米</item>
+        <item>平方分米</item>
+        <item>平方米</item>
+        <item>平方千米</item>
+    </string-array>
+    <string-array name="weight">
+        <item>毫克</item>
+        <item>克</item>
+        <item>钱</item>
+        <item>两</item>
+        <item>担</item>
+        <item>市斤</item>
+        <item>公斤</item>
+        <item>吨</item>
+        <item>磅</item>
+        <item>盎司</item>
+    </string-array>
     <integer-array name="DateNumber">
         <item>6</item>
         <item>12</item>

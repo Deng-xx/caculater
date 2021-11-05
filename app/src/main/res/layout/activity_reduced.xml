@@ -10,11 +10,17 @@
         android:id="@+id/spinner4"
         android:layout_width="0dp"
         android:layout_height="69dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
         android:layout_marginTop="163dp"
+        android:layout_marginEnd="38dp"
+        android:layout_marginRight="38dp"
         android:layout_marginBottom="166dp"
+        android:background="#E5E5E5"
         app:layout_constraintBottom_toTopOf="@+id/spinner3"
         app:layout_constraintEnd_toEndOf="@+id/spinner3"
-        app:layout_constraintStart_toStartOf="@+id/spinner3"
+        app:layout_constraintEnd_toStartOf="@+id/editTextNumber3"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
@@ -56,32 +62,45 @@
 
     <Spinner
         android:id="@+id/spinner3"
-        android:layout_width="120dp"
+        android:layout_width="0dp"
         android:layout_height="69dp"
         android:layout_marginStart="16dp"
         android:layout_marginLeft="16dp"
+        android:layout_marginEnd="38dp"
+        android:layout_marginRight="38dp"
         android:layout_marginBottom="264dp"
+        android:background="#E5E5E5"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/editTextNumber4"
         app:layout_constraintStart_toStartOf="parent" />
 
     <EditText
         android:id="@+id/editTextNumber3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="27dp"
+        android:layout_marginRight="27dp"
         android:ems="10"
-        android:inputType="number"
+        android:inputType="numberDecimal"
+        android:hint="在此输入待换算数值"
         app:layout_constraintBottom_toBottomOf="@+id/spinner4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/spinner4"
         app:layout_constraintTop_toTopOf="@+id/spinner4"
-        app:layout_constraintVertical_bias="0.625"
-        tools:layout_editor_absoluteX="174dp" />
+        app:layout_constraintVertical_bias="0.625" />
 
     <EditText
         android:id="@+id/editTextNumber4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="27dp"
+        android:layout_marginRight="27dp"
         android:ems="10"
-        android:inputType="number"
+        android:hint="此处显示换算后数值"
+        android:inputType="none"
+        android:focusable="false"
         app:layout_constraintBottom_toBottomOf="@+id/spinner3"
-        app:layout_constraintTop_toTopOf="@+id/spinner3"
-        tools:layout_editor_absoluteX="174dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/spinner3"
+        app:layout_constraintTop_toTopOf="@+id/spinner3" />
 </androidx.constraintlayout.widget.ConstraintLayout>

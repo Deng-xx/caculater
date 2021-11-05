@@ -24,6 +24,10 @@
             android:exported="true"
             android:parentActivityName=".MainActivity"/>
         <activity
+            android:name=".ReducedActivity"
+            android:exported="true"
+            android:parentActivityName=".MoreFunctionActivity"/>
+        <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"

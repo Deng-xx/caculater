@@ -46,7 +46,7 @@
         android:id="@+id/gotoreduced"
         android:layout_width="308dp"
         android:layout_height="82dp"
-        android:layout_marginTop="408dp"
+        android:layout_marginTop="340dp"
         android:onClick="goToreduced"
         android:text="@string/reduced"
         app:layout_constraintEnd_toEndOf="parent"
